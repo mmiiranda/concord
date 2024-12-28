@@ -27,7 +27,7 @@ import RegisterForm from "@/components/form/Register.vue";
         name: "LoginView",
         data(){
           return{
-            Isregister: 1
+            Isregister: 0
           }
         },
         methods: {

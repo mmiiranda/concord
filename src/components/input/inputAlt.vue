@@ -1,10 +1,11 @@
 <template>
     <div>
         <label :for="name">
-            {{ label }}
+            {{ label    }}
         </label>
         <input :type="type" 
         :name="name"
+        :placeholder="placeholder"
         class="bg-black w-full p-2 text-white outline-none rounded" />
     </div>
 </template>
@@ -21,7 +22,8 @@
             name: {
                 type: String,
                 required: true
-            }
+            },
+            placeholder: String,
         }
     }
 </script>

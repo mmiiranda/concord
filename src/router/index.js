@@ -10,16 +10,16 @@ const routes = [
     component: MainView
   },
   {
-    path: '/logi',
-    name: 'logi',
+    path: '/login',
+    name: 'login',
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: LoginView
   },
   {
-    path: '/login',
-    name: 'login',
+    path: '/confirmarEmail',
+    name: 'confirmarEmail',
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.

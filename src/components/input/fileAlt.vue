@@ -14,7 +14,7 @@
        >
           <img 
              :src="previewImage || defaultIcon" 
-             alt="Selected Image" 
+             alt="Selected File" 
              class="w-full h-full object-cover rounded-full"
           >
        </label>
@@ -51,6 +51,7 @@
              const reader = new FileReader();
              reader.onload = (e) => {
                 this.previewImage = e.target.result;
+                console.log(this.previewImage)
              };
              reader.readAsDataURL(file);
           }

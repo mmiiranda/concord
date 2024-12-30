@@ -138,6 +138,7 @@ module.exports = {
       black: colors.black,
       white: colors.white,
       slate: colors.slate,
+      shadowgray: "#4B5563",
       cleangray: "#374151",
       darkgray: "#328ED0",
       gray: "#D9D9D9",

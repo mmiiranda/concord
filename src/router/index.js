@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import MainView from '../views/MainView.vue'
 import LoginView from '@/views/LoginView.vue'
 import ConfirmarEmailView from '@/views/ConfirmarEmailView.vue'
+import RedefinitSenha from '@/views/RedefinitSenha.vue'
 
 const routes = [
   {
@@ -18,6 +19,11 @@ const routes = [
     path: '/confirmarEmail',
     name: 'confirmarEmail',
     component: ConfirmarEmailView
+  },
+  {
+    path: '/redefinirSenha',
+    name: 'redefinirSenha',
+    component: RedefinitSenha
   }
 ]
 

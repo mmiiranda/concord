@@ -9,7 +9,10 @@
                 class="grid place-items-center"/>
                 <inputAlt  type="text" name="ServerName" placeholder="Insira o nome do Server"/>
                 <div class="flex w-full justify-center gap-4">
-                    <buttonAlt class="w-full" type="button" value="Fechar" />
+                    <borderButton class="w-full text-red border-red px-1 py-1" 
+                    type="button" 
+                    value="Fechar" 
+                    @click="closeModal" />
                     <buttonAlt class="w-full" type="submit" value="Criar Server" />
                 </div>
             </form>
@@ -20,6 +23,7 @@
 <script>
 import inputAlt from "@/components/input/inputAlt.vue"
 import buttonAlt from "@/components/input/buttonAlt.vue"
+import borderButton from "@/components/input/borderButton.vue"
 import fileAlt from "@/components/input/fileAlt.vue"
 import ModalOverlay from "@/components/modal/modalOverlay.vue"
 
@@ -29,7 +33,14 @@ import ModalOverlay from "@/components/modal/modalOverlay.vue"
             inputAlt,
             buttonAlt,
             fileAlt,
+            borderButton,
             ModalOverlay
+        },
+        emits: ["close"],
+        methods: {
+        closeModal() {
+            this.$emit("close"); 
         }
+    }
     }
 </script>

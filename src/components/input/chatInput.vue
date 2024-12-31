@@ -56,9 +56,10 @@ export default {
             message: "",
             fileUpdateContent: false,
             audioRecoderContent: false,
+            selectedFile: null, // Propriedade para rastrear o arquivo selecionado
         };
     },
-    components:{
+    components: {
         PopupComp,
         MideaRecorder,
         PopupFormFile
@@ -84,10 +85,22 @@ export default {
         },
         recordAudio() {
             this.$refs.midiaRecorderRef.startRecording();
+        },
+        handleSubmit() {
+            // Aqui você verifica se há um arquivo selecionado e exclui
+            if (this.selectedFile) {
+                this.deleteSelectedFile();
+            }
+            this.message = ""; // Limpa a mensagem após o envio
+        },
+        deleteSelectedFile() {
+            this.selectedFile = null; // Simula a exclusão do arquivo
+            console.log("Arquivo excluído.");
         }
     },
 };
 </script>
+
 
 <style>
 textarea::placeholder {

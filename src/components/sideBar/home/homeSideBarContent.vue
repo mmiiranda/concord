@@ -7,7 +7,7 @@
             </div>
         </div>
         <div class="flex flex-col gap-2">
-            <FriendInMenu 
+            <miniFriendProfile 
             v-for="(friend, index) in friends" 
                 :key="index" 
                 :name="friend.name"
@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import FriendInMenu from '@/components/friends/friendInMenu.vue';
+import miniFriendProfile from '@/components/friends/miniFriendProfile.vue';
 
 
     export default {
@@ -33,7 +33,7 @@ import FriendInMenu from '@/components/friends/friendInMenu.vue';
             }
         },
         components: {
-            FriendInMenu
+            miniFriendProfile
         }
     }
 </script>

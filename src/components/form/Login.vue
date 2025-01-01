@@ -6,7 +6,7 @@
         </div>
         <form>
             <div class="flex flex-col gap-2">
-                <inputAlt label="Email" type="text" name="email" />
+                <inputAlt label="Username" type="text" name="username" />
                 <inputAlt label="Senha" type="password" name="senha" />
             </div>
             <div class="text-right">

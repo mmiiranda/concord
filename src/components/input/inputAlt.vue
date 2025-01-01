@@ -6,7 +6,10 @@
         <input :type="type" 
         :name="name"
         :placeholder="placeholder"
-        class="bg-black w-full p-2 text-white outline-none rounded" />
+        class="bg-black w-full p-2 text-white outline-none rounded" 
+        :value="value"
+        :disabled="disabled" 
+          />
     </div>
 </template>
 
@@ -24,6 +27,8 @@
                 required: true
             },
             placeholder: String,
+            disabled: Boolean,
+            value: String,
         }
     }
 </script>

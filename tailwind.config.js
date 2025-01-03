@@ -14,6 +14,7 @@ module.exports = {
       ping: 'ping 1s cubic-bezier(0, 0, 0.2, 1) infinite',
       pulse: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
       bounce: 'bounce 1s infinite',
+      spawn: "spawn .3s forwards"
     },
     aria: {
       busy: 'busy="true"',
@@ -599,6 +600,16 @@ module.exports = {
           animationTimingFunction: 'cubic-bezier(0,0,0.2,1)',
         },
       },
+      spawn: {
+        '0%':{
+          transform: 'translateY(-16px)',
+          opacity: "0" 
+        },
+        '100%':{
+          transform: 'translateY(0)',
+          opacity: "1" 
+        }
+      }
     },
     letterSpacing: {
       tighter: '-0.05em',

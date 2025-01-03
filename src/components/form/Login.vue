@@ -2,48 +2,99 @@
     <div class="flex flex-col text-white gap-12 w-full">
         <div class="grid place-items-center">
             <img src="logo.svg" alt="Concord Logo">
-            <h1 class="font-bold text-3xl">Bem Vindo ao Concord</h1>
+            <h1 class="font-bold text-3xl text-center">Bem Vindo ao Concord</h1>
         </div>
-        <form>
+        <form @submit.prevent="handleSubmit" novalidate>
             <div class="flex flex-col gap-2">
-                <inputAlt label="Email" type="text" name="email" />
-                <inputAlt label="Senha" type="password" name="senha" />
+                <inputAlt
+                    label="Username"
+                    type="text"
+                    name="username"
+                    id="Username"
+                    placeholder="Digite seu username"
+                    required
+                />
+                <inputAlt
+                    label="Senha"
+                    type="password"
+                    name="password"
+                    id="Senha"
+                    placeholder="Digite sua senha"
+                    required
+                    minlength="8"
+                />
             </div>
             <div class="text-right">
-                <a href="#" class="text-blue"
-                @click="toogleForgetModalOpen">
+                <a href="#" class="text-blue" @click="toggleForgetModal">
                     Esqueceu a Senha?
                 </a>
             </div>
-
             <buttonAlt type="submit" value="Log In" class="mt-6" />
         </form>
-        <EmailForForgetPassword @close="toogleForgetModalOpen"  v-show="ForgetModalOpen"/>
+        <EmailForForgetPassword @close="toggleForgetModal" v-show="ForgetModalOpen" />
     </div>
-
 </template>
 
 <script>
-import inputAlt from "@/components/input/inputAlt.vue"
-import buttonAlt from "@/components/input/buttonAlt.vue"
+import inputAlt from "@/components/input/inputAlt.vue";
+import buttonAlt from "@/components/input/buttonAlt.vue";
 import EmailForForgetPassword from "./EmailForForgetPassword.vue";
+import { mapActions } from "vuex";
 
-    export default {
-        name: "LoginForm",
-        data(){
-            return{
-                ForgetModalOpen: false
+export default {
+    name: "LoginForm",
+    components: {
+        inputAlt,
+        buttonAlt,
+        EmailForForgetPassword
+    },
+    data() {
+        return {
+            ForgetModalOpen: false
+        };
+    },
+    methods: {
+        ...mapActions(["toogleLoading"]),
+        toggleForgetModal() {
+            this.ForgetModalOpen = !this.ForgetModalOpen;
+        },
+        handleSubmit(event) {
+            const form = event.target.closest("form");
+            
+            if (!form.checkValidity()) {
+                const inputs = form.querySelectorAll("input, select, textarea");
+                inputs.forEach(input => {
+                    if (!input.validity.valid) {
+                        this.$toast(`Erro no campo "${input.id}": ${input.validationMessage}`, "error");
+                    }
+                });
+            } else {
+                this.loginUser();
             }
         },
-        methods:{
-            toogleForgetModalOpen(){
-               this.ForgetModalOpen = !this.ForgetModalOpen;
+        async loginUser() {
+            const form = document.querySelector("form");
+            const data = new FormData(form);
+            const json = Object.fromEntries(data.entries());
+
+            console.log(json)
+            this.toogleLoading();
+            try {
+                const response = await fetch("http://localhost:8080/api/auth/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(json)
+                });
+                if (response.status === 200) {
+                    this.$router.push("/");
+                } else {
+                    this.$toast("Usuário ou senha incorretos", "error");
+                }
+                this.toogleLoading();   
+            } catch (err) {
+                this.$toast("Houve um problema ao realizar o login", "error");
             }
-        },
-        components: {
-            inputAlt,
-            buttonAlt,
-            EmailForForgetPassword
-        },
+        }
     }
+};
 </script>

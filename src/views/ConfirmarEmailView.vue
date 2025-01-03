@@ -6,7 +6,7 @@
                 <h2 class="text-3xl font-bold">Quase tudo Pronto</h2>
             </div>
             <p class="text-xl">Insira o cógido que foi enviado ao seu email</p>
-           <CodeForm />
+           <CodeForm v-on:loading="toogleLoading"/>
             <div>
                 <borderButton type="button" value="Não Recebeu o Email?"  class="border-darkpurple text-darkpurple"/>
             </div>
@@ -17,12 +17,16 @@
 <script>
 import CodeForm from "@/components/form/codeForm.vue";
 import borderButton from "@/components/input/borderButton.vue";
+import { mapActions } from "vuex";
 
     export default {
         name: "ConfirmarEmailView",
+        methods: {
+          ...mapActions(["toogleLoading"])
+        },
         components: {   
             borderButton,
-            CodeForm
+            CodeForm,
         }
     }
 </script>       

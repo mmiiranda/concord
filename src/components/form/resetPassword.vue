@@ -1,17 +1,21 @@
 <template>
-    <form @submit="submitForm" class="flex flex-col gap-8">
+    <form @submit.prevent="handleSubmit" class="flex flex-col gap-8" novalidate>
         <div class="flex flex-col gap-3">
             <InputAlt 
                 id="newPassword"
-                name="newPassword"
+                name="Nova Senha"
                 placeholder="Nova Senha"
                 type="password"
+                required
+                minlength="8"
             />
             <InputAlt 
                 id="confirmNewPassword"
-                name="confirmNewPassword"
+                name="Confirmar Nova Senha"
                 placeholder="Confirmar Nova Senha"
                 type="password"
+                required
+                minlength="8"
             />
         </div>
         <ButtonAlt 
@@ -23,34 +27,90 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex';
 import ButtonAlt from '../input/buttonAlt.vue';
 import InputAlt from '../input/inputAlt.vue';
 
 export default {
-    name: "resetPassword",
+    name: "ResetPassword",
+    data() {
+        return {
+            novaSenha: {
+                newPassword: null
+            }
+        };
+    },
     components: {
         InputAlt,
         ButtonAlt
     },
     methods: {
-        submitForm(event) {
-            event.preventDefault();
-
+        ...mapActions(["toogleLoading"]),
+        handleSubmit(event) {
+            const form = event.target.closest("form");
+            
+            if (!form.checkValidity()) {
+                const inputs = form.querySelectorAll("input");
+                inputs.forEach(input => {
+                    if (!input.validity.valid) {
+                        this.$toast(`Erro no campo "${input.name}": ${input.validationMessage}`, "error");
+                    }
+                });
+            } else {
+                this.submitForm();
+            }
+        },
+        async submitForm() {
             const newPassword = document.getElementById("newPassword").value;
             const confirmNewPassword = document.getElementById("confirmNewPassword").value;
 
-            if (newPassword.trim() === "" || confirmNewPassword.trim() === "") {
-                alert("Por favor, preencha ambos os campos.");
+            const token = this.$route.query.token;
+
+            let senha = newPassword.trim()
+
+            
+
+            if (senha === "" || confirmNewPassword.trim() === "") {
+                this.$toast("Por favor, preencha ambos os campos", "error");
+                return;
+            }
+
+            if(senha < 8){
+                this.$toast("Senha deve  no mínimo 8 caracteres", "error")
                 return;
             }
 
             if (newPassword !== confirmNewPassword) {
-                alert("As senhas não coincidem. Tente novamente.");
+                this.$toast("As senhas não coincidem. Tente novamente", "error  ");
                 return;
             }
 
-            alert("Senha redefinida com sucesso!");
-            this.$router.push("/login");
+            this.novaSenha.newPassword = newPassword;
+
+
+            this.toogleLoading()
+            try {
+                const response = await fetch(`http://localhost:8080/api/auth/reset-password?token=${token}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(this.novaSenha)
+                });
+
+                if (response.ok) {
+                    this.$toast("Senha redefinida com sucesso!", "sucess");
+                    this.$router.push("/login");
+                } else {
+                    const errorDetails = await response.json();
+                    console.error("Erro na resposta:", errorDetails);
+                    this.$toast("Erro ao redefinir a senha. Tente novamente", "error");
+                }
+                this.toogleLoading()
+            } catch (err) {
+                console.error("Erro ao processar a solicitação:", err);
+                this.$toast("Houve um problema ao redefinir sua senha. Tente novamente mais tarde", "error");
+            }
         }
     }
 };

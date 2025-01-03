@@ -7,11 +7,11 @@
         <form @submit.prevent="handleSubmit" novalidate>
             <div class="flex flex-col gap-2">
                 <inputAlt
-                    label="Username"
+                    label="Email"
                     type="text"
-                    name="username"
-                    id="Username"
-                    placeholder="Digite seu username"
+                    name="email"
+                    id="Email"
+                    placeholder="Digite seu Email"
                     required
                 />
                 <inputAlt
@@ -77,22 +77,32 @@ export default {
             const data = new FormData(form);
             const json = Object.fromEntries(data.entries());
 
-            console.log(json)
+            console.log(json);
             this.toogleLoading();
+            
             try {
                 const response = await fetch("http://localhost:8080/api/auth/login", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(json)
                 });
-                if (response.status === 200) {
+
+                if (response.ok) {
+                    const responseData = await response.json(); 
+
+                    localStorage.setItem("token", responseData.token);
+                    localStorage.setItem("UserSetting", JSON.stringify(responseData.user));
+
                     this.$router.push("/");
                 } else {
+                    console.log("Erro ao fazer login", response);
                     this.$toast("Usuário ou senha incorretos", "error");
-                }
-                this.toogleLoading();   
+                }   
             } catch (err) {
+                console.error("Erro na requisição:", err);
                 this.$toast("Houve um problema ao realizar o login", "error");
+            } finally {
+                this.toogleLoading();
             }
         }
     }

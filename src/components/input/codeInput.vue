@@ -1,56 +1,82 @@
 <template>
-    <div class="flex gap-2 p-2 bg-transparent">
+  <div class="flex flex-col gap-2 p-2 bg-transparent">
+    <!-- Hidden main input -->
+    <input 
+      type="text" 
+      class="hidden-input" 
+      v-model="hiddenValue" 
+      @input="updateValueArrayFromHidden"
+      @paste="handlePaste"
+      ref="hiddenInput"
+    />
+
+    <!-- Visible segmented inputs (representing indexes) -->
+    <div class="flex gap-2">
       <div v-for="(char, index) in valueArray" 
       :key="index" 
       class="w-10 h-10 flex justify-center items-center bg-darkblue rounded-lg shadow-md">
-        <input
-          type="text"
-          class="w-full h-full text-center text-base font-bold border-none text-white bg-transparent rounded-lg"
-          maxlength="1"
-          v-model="valueArray[index]"
-          @input="handleInput(index, $event)"
-          :ref="'input-' + index"
-        />
+        <div
+          class="w-full h-full text-center text-base font-bold text-white bg-transparent rounded-lg cursor-pointer flex justify-center items-center"
+          @click="focusHiddenInputAt(index)"
+        >
+          {{ char || " " }}
+        </div>
       </div>
     </div>
-  </template>
-  
-  <script>
-  export default {
-    name: "codeInput",
-    data() {
-      return {
-        valueArray: Array(8).fill(""),
-      };
+  </div>
+</template>
+
+<script>
+export default {
+  name: "codeInput",
+  data() {
+    return {
+      valueArray: Array(8).fill(""),
+      hiddenValue: "", 
+    };
+  },
+  methods: {
+    focusHiddenInputAt(index) {
+      const hiddenInput = this.$refs.hiddenInput;
+      if (hiddenInput && hiddenInput.setSelectionRange) {
+        hiddenInput.focus();
+        hiddenInput.setSelectionRange(index, index + 1);
+      }
     },
-    methods: {
-      handleInput(index, event) {
-        const input = event.target.value;
-  
-        if (/^[a-zA-Z0-9]*$/.test(input)) {
-          this.valueArray[index] = input; 
-        } else {
-          this.valueArray[index] = ""; 
-        }
-  
-        if (input && index < this.valueArray.length - 1) {
-          const nextInput = this.$refs[`input-${index + 1}`][0];
-          if (nextInput && nextInput.focus) {
-            nextInput.focus();
-          }
-        }
-  
-        if (this.valueArray.every((char) => char !== "")) {
-          this.$emit("update:value", this.valueArray.join(""));
-        }
-      },
+    updateValueArrayFromHidden() {
+      const sanitizedValue = this.hiddenValue.replace(/[^a-zA-Z0-9]/g, "").slice(0, this.valueArray.length);
+      this.valueArray = sanitizedValue.split("").concat(Array(this.valueArray.length - sanitizedValue.length).fill(""));
+      this.hiddenValue = sanitizedValue;
+      this.$emit("update:value", this.hiddenValue);
     },
-  };
-  </script>
-  
-  <style scoped>
-  .char-box input:focus {
-    border: 2px solid #007bff;
-    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.4);
-  }
-  </style>
+    handlePaste(event) {
+      const pastedValue = (event.clipboardData || window.clipboardData).getData("text");
+      this.hiddenValue = pastedValue.replace(/[^a-zA-Z0-9]/g, "").slice(0, this.valueArray.length);
+      this.updateValueArrayFromHidden();
+      event.preventDefault();
+    },
+    focusHiddenInput() {
+      const hiddenInput = this.$refs.hiddenInput;
+      if (hiddenInput) {
+        hiddenInput.focus();
+      }
+    },
+  },
+  mounted() {
+    this.focusHiddenInput();
+  },
+};
+</script>
+
+<style scoped>
+.hidden-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.char-box input:focus {
+  border: 2px solid #007bff;
+  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.4);
+}
+</style>

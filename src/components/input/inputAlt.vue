@@ -8,6 +8,8 @@
             :type="type"
             class="bg-black w-full p-2 text-white outline-none rounded"
             :placeholder="placeholder"
+            :value="modelValue"
+            @input="$emit('update:modelValue', $event.target.value)"
         />
     </div>
 </template>
@@ -29,7 +31,8 @@ export default {
             type: String,
             required: true
         },
-        placeholder: String
+        placeholder: String,
+        modelValue: String
     }
 };
 </script>

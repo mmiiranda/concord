@@ -54,16 +54,14 @@ export default {
             };
             reader.readAsDataURL(file);
             
-            // Chamar o método para fazer upload
             await this.uploadFile(file);
          }
       },
       
       async uploadFile(file) {
          const formData = new FormData();
-         formData.append("image", file); // O campo deve ser "image"
+         formData.append("image", file);
 
-         // Obtém o token do localStorage
          const token = localStorage.getItem("token");
 
          try {
@@ -71,7 +69,7 @@ export default {
                method: "POST",
                body: formData,
                headers: {
-                  "Authorization": `Bearer ${token}` // Enviando o token JWT
+                  "Authorization": `Bearer ${token}`
                }
             });
 
@@ -80,7 +78,10 @@ export default {
             }
 
             const data = await response.json();
-            console.log("File ID:", data.fileId); // Printa o fileId no console
+            console.log("File ID:", data.fileId);
+
+            // ✅ Agora enviamos o `fileId` corretamente para o componente pai
+            this.$emit("imageUploaded", data.fileId);
 
          } catch (error) {
             console.error("Erro no upload:", error);

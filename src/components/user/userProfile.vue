@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import defaultImage from "@/assets/default-avatar.png";  // ✅ Caminho correto
+import defaultImage from "@/assets/default-avatar.png";
 
 export default {
     name: "UserProfile",
@@ -26,7 +26,7 @@ export default {
                 username: "@unknown",
                 imagePath: null
             },
-            defaultImage  // ✅ Imagem padrão caso o `imagePath` seja nulo
+            defaultImage 
         };
     },
     mounted() {
@@ -41,7 +41,7 @@ export default {
                     this.user = {
                         name: parsedUser.name || "unknown",
                         username: "@" + parsedUser.username || "@unknown",
-                        imagePath: parsedUser.imagePath  // Pode ser `null`
+                        imagePath: parsedUser.imagePath 
                     };
                 } catch (error) {
                     console.error("Erro ao carregar os dados do usuário:", error);
@@ -51,7 +51,7 @@ export default {
 
         getProfileImage() {
             if (this.user.imagePath) {
-                return `http://localhost:8080/uploads/${this.user.imagePath}`;  // 🔥 Ajuste para carregar imagens remotas do backend
+                return `http://localhost:8080/uploads/${this.user.imagePath}`; 
             }
             return this.defaultImage;
         }

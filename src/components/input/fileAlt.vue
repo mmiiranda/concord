@@ -80,7 +80,6 @@ export default {
             const data = await response.json();
             console.log("File ID:", data.fileId);
 
-            // ✅ Agora enviamos o `fileId` corretamente para o componente pai
             this.$emit("imageUploaded", data.fileId);
 
          } catch (error) {

@@ -2,12 +2,10 @@
     <div class="flex h-[90vh] bg-darkblue px-4 py-6">
         <div class="flex flex-col items-center justify-between">
             <div class="flex flex-col">
-                <!-- Ícone padrão inicial -->
                 <MiniServerIcon name="Home" :link="'/'" />
 
                 <div class="w-4/5 bg-hovergray h-1 mt-2"></div>
 
-                <!-- Renderizando os servidores do usuário -->
                 <div class="flex flex-col mt-2 gap-3">
                     <MiniServerIcon 
                         v-for="server in servers" 
@@ -16,14 +14,11 @@
                         :name="server.name"
                         :imagePath="server.imagePath"
                     />
+                    <CreateServerIcon @click="toogleModalCreateServer" />
                 </div>
             </div>
-            
-            <!-- Ícone para criar novo servidor -->
-            <CreateServerIcon @click="toogleModalCreateServer" />
         </div>
 
-        <!-- Adicionando animação com transições -->
         <transition name="slide">
             <div 
                 v-if="isOpen" 
@@ -35,7 +30,6 @@
             </div>
         </transition>
 
-        <!-- ✅ Correção: fechamento correto do componente -->
         <createServer 
             v-if="ModalCreateServer" 
             @close="toogleModalCreateServer"
@@ -47,7 +41,7 @@
 <script>
 import MiniServerIcon from "@/components/servers/MiniServerIcon.vue";
 import CreateServerIcon from "@/components/servers/CreateServerIcon.vue";
-import CreateServer from "@/components/form/CreateServer.vue";  // ⚠️ Certifique-se que o nome está correto!
+import CreateServer from "@/components/form/CreateServer.vue";  
 import HomeSideBarContent from "./home/homeSideBarContent.vue";
 
 export default {
@@ -55,14 +49,14 @@ export default {
     components: {
         MiniServerIcon,
         CreateServerIcon,
-        CreateServer, // ⚠️ Certifique-se de que está registrado corretamente
+        CreateServer, 
         HomeSideBarContent
     },
     data() {
         return {
             isOpen: true,
             ModalCreateServer: false,
-            servers: [] // Armazena a lista de servidores do usuário
+            servers: [] 
         };
     },
     mounted() {

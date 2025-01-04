@@ -47,7 +47,7 @@ import fileAlt from "@/components/input/fileAlt.vue"
 import ModalOverlay from "@/components/modal/modalOverlay.vue"
 
 export default {
-    name: "createServer",
+    name: "CreateServer",
     components: {
         inputAlt,
         buttonAlt,
@@ -61,10 +61,10 @@ export default {
             imageTempPath: null
         };
     },
-    emits: ["close"],
+    emits: ["close", "serverCreated"], // ✅ Emite evento para atualizar os servidores na sidebar
     methods: {
         closeModal() {
-            this.$emit("close");  // ✅ Fecha o modal
+            this.$emit("close");  
         },
 
         setImageTempPath(fileId) {
@@ -75,6 +75,7 @@ export default {
         async createServer() {
             await this.$nextTick();
 
+            // Obtém informações do usuário logado
             const userSettings = localStorage.getItem("UserSetting");
             if (!userSettings) {
                 console.error("Erro: Configurações do usuário não encontradas no localStorage.");
@@ -84,11 +85,13 @@ export default {
             const user = JSON.parse(userSettings);
             const ownerId = user.id;
 
+            // Debug - Verifica os dados antes da requisição
             console.log("Tentando criar servidor com os seguintes dados:");
             console.log("Nome do Servidor:", this.serverName);
             console.log("Imagem Temporária (UUID):", this.imageTempPath);
             console.log("Dono (ownerId):", ownerId);
 
+            // Verifica se os campos obrigatórios estão preenchidos
             if (!this.serverName || !this.imageTempPath) {
                 console.error("Erro: Nome do servidor ou imagem não informados.");
                 return;
@@ -119,7 +122,8 @@ export default {
                 const data = await response.json();
                 console.log("Servidor criado com sucesso:", data);
 
-                // ✅ FECHA O MODAL APÓS CRIAR O SERVIDOR COM SUCESSO
+                this.$emit("serverCreated");
+
                 this.closeModal(); 
 
             } catch (error) {

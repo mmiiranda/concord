@@ -20,7 +20,7 @@
             </div>
             
             <!-- Ícone para criar novo servidor -->
-            <MiniServerIcon @click="toogleModalCreateServer" name="+" />
+            <CreateServerIcon @click="toogleModalCreateServer" />
         </div>
 
         <!-- Adicionando animação com transições -->
@@ -35,20 +35,27 @@
             </div>
         </transition>
 
-        <createServer @close="toogleModalCreateServer" v-if="ModalCreateServer" />
+        <!-- ✅ Correção: fechamento correto do componente -->
+        <createServer 
+            v-if="ModalCreateServer" 
+            @close="toogleModalCreateServer"
+            @serverCreated="fetchUserServers"
+        />
     </div>
 </template>
 
 <script>
 import MiniServerIcon from "@/components/servers/MiniServerIcon.vue";
-import createServer from "@/components/form/CreateServer.vue";
+import CreateServerIcon from "@/components/servers/CreateServerIcon.vue";
+import CreateServer from "@/components/form/CreateServer.vue";  // ⚠️ Certifique-se que o nome está correto!
 import HomeSideBarContent from "./home/homeSideBarContent.vue";
 
 export default {
     name: "sideBar",
     components: {
         MiniServerIcon,
-        createServer,
+        CreateServerIcon,
+        CreateServer, // ⚠️ Certifique-se de que está registrado corretamente
         HomeSideBarContent
     },
     data() {
@@ -94,12 +101,13 @@ export default {
 
                 const data = await response.json();
 
-                // Evita erro de array indefinido e trata valores nulos
                 this.servers = Array.isArray(data)
                     ? data.map(server => ({
                         id: server.id,
                         name: server.name || "Servidor",
-                        imagePath: `http://localhost:8080/api/files/images?file-id=${server.imagePath}` || null
+                        imagePath: server.imagePath 
+                            ? `http://localhost:8080/api/files/images?file-id=${server.imagePath}`
+                            : null
                     }))
                     : [];
 

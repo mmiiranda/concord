@@ -23,7 +23,7 @@ export default {
         },
         name: {
             type: String,
-            default: "Servidor" // Se não vier nada, usa "Servidor"
+            default: "Servidor"
         },
         imagePath: {
             type: String,

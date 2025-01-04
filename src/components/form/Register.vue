@@ -56,7 +56,7 @@
                         Eu aceito os <a href="#" class="text-blue">Termos de Serviço</a> e a <a href="#" class="text-blue">Política de Privacidade</a>
                     </span>
             </div>
-            <buttonAlt type="submit" value="Registrar" class="mt-6" />
+            <buttonAlt type="submit" value="Registrar" class="mt-6 " />
         </form>
     </div>
 </template>
@@ -77,18 +77,17 @@ export default {
         handleSubmit(event) {
             const form = event.target.closest("form");
             
-            if (!form.checkValidity()) {
-                const inputs = form.querySelectorAll("input, select, textarea");
-                inputs.forEach(input => {
-                    if (!input.validity.valid) {
-                        this.$toast(`Erro no campo "${input.id}": ${input.validationMessage}`, "error");
-                    }
-                }); 
-                
-                
-            } else {
+        if (!form.checkValidity()) {
+            const inputs = form.querySelectorAll("input, select, textarea");
+            for (const input of inputs) {
+                if (!input.validity.valid) {
+                    this.$toast(`Erro no campo "${input.id}": ${input.validationMessage}`, "error");
+                    break;
+                }
+            }
+        } else {
                 const password = form.querySelector("[name='password']").value;
-                 const confirmPassword = form.querySelector("[name='senha_confirm']").value;
+                const confirmPassword = form.querySelector("[name='senha_confirm']").value;
 
                 if (password !== confirmPassword) {
                     this.$toast("As senhas não coincidem. Tente novamente.", "error");

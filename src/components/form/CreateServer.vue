@@ -13,7 +13,11 @@
                     type="button" 
                     value="Fechar" 
                     @click="closeModal" />
-                    <buttonAlt class="w-full" type="submit" value="Criar Server" />
+                    
+                    <buttonAlt class="w-full" 
+                    type="submit" 
+                    value="Criar Server" 
+                    />
                 </div>
             </form>
         </div>

@@ -1,6 +1,5 @@
 <template>
   <div class="flex flex-col gap-2 p-2 bg-transparent">
-    <!-- Hidden main input -->
     <input 
       type="text" 
       class="hidden-input" 
@@ -10,7 +9,6 @@
       ref="hiddenInput"
     />
 
-    <!-- Visible segmented inputs (representing indexes) -->
     <div class="flex gap-2">
       <div v-for="(char, index) in valueArray" 
       :key="index" 

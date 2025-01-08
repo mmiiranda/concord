@@ -10,7 +10,7 @@ const app = createApp(App);
 
 app.config.globalProperties.$toast = (message, type = "info", options = {}) => {
   const defaultOptions = {
-    autoClose: 1000,
+    autoClose: 2000,
     position: "top-right",
     theme: "dark",
     ...options,

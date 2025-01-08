@@ -1,9 +1,11 @@
     <template>
-    <div class="friend-chat-row border-b-2 py-3 border-[#718099] flex w-full justify-between items-center
+    <div class="friend-chat-row border-b-2 py-3 border-[#808080] flex w-full justify-between items-center
     hover:bg-gray/20 px-2 transition-all ease-in">
             <div class="flex items-center gap-2">
-                <div class="overflow-hidden flex h-9 w-9 relative">
-                    <img :src="src" class="w-full h-full rounded-full">
+                <div class=" bg-darkblue
+             flex h-9 w-9 relative rounded-full justify-center items-center">
+                    <span> {{ name[0].toUpperCase() }} </span>
+                    <img :src="src" class="w-full h-full" v-show="src != null">
                     <div :class="['w-3 h-3 absolute bottom-0 right-0 rounded-full',
                     isOnline ? 'bg-[#00C417]': 'bg-red']"></div>
                 </div>

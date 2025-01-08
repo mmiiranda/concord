@@ -12,12 +12,12 @@ export default createStore({
     getToken: (state) => state.token
   },
   mutations: {
-    TOGGLE_LOADING(state) {
+    TOOGLE_LOADING(state) {
       state.loading = !state.loading;
     },
     SET_USER(state, user) {
-      state.user = user;
-      localStorage.setItem('UserSetting', JSON.stringify(user)); // Certifique-se de armazenar corretamente
+      state.user = user
+      localStorage.setItem('UserSetting', JSON.stringify(user)); 
     },
     SET_TOKEN(state, token) {
       state.token = token;
@@ -29,24 +29,29 @@ export default createStore({
       localStorage.removeItem('UserSetting');
       localStorage.removeItem('token');
     },
+    UPDATE_LOCALHOST(state){
+      state.user = JSON.parse(localStorage.getItem('UserSetting')) || null;
+      state.token = localStorage.getItem('token') || null
+    }
   },
   actions: {
-    toggleLoading({ commit }) {
-      commit('TOGGLE_LOADING');
+    toogleLoading({ commit }) {
+      commit('TOOGLE_LOADING');
     },
     
     setLoading({ commit }, value) {
       commit('SET_LOADING', value);
     },
 
-    login({ commit }, { user, token }) {
-      commit('SET_USER', user);
-      commit('SET_TOKEN', token);
+    login({ commit }) {
+      commit("UPDATE_LOCALHOST")
     },
 
     logout({ commit }) {
       commit('LOGOUT');
     },
+    
+
   },
   modules: {},
 });

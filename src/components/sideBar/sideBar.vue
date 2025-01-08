@@ -1,6 +1,6 @@
 <template>
-    <div class="flex h-[90vh] bg-darkblue px-4 py-6">
-        <div class="flex flex-col items-center justify-between">
+    <div class="flex h-[90vh] bg-darkblue">
+        <div class="flex flex-col items-center py-6">
             <div class="flex flex-col">
                 <MiniServerIcon name="Home" :link="'/'" />
 
@@ -22,7 +22,7 @@
         <transition name="slide">
             <div 
                 v-if="isOpen" 
-                class="flex flex-col ml-8 text-white min-w-48"
+                class="bg-[#363636] flex flex-col ml-2 text-white min-w-48"
             >
                 <div>
                     <HomeSideBarContent />

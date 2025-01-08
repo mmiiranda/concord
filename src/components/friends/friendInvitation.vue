@@ -14,17 +14,31 @@
                  </div>
              </div>
          </div>
-         
-         <div class="rounded-full bg-darkblue w-6 h-6 grid place-items-center
-         cursor-pointer">
-             <img src="../icon/close.svg" 
-             class="object-cover size-3"
-             alt="chat icon">
-         </div>
+
+        <div class="flex gap-2">
+            <div class="rounded-full bg-darkblue w-6 h-6 grid place-items-center
+            cursor-pointer"
+            v-show="origin != this.getUser.id">
+                <img 
+                src="../icon/Done.svg" 
+                class="object-cover size-3"
+                alt="chat icon" 
+                >
+            </div>
+            <div class="rounded-full bg-darkblue w-6 h-6 grid place-items-center
+            cursor-pointer">
+                <img src="../icon/close.svg" 
+                class="object-cover size-3"
+                alt="chat icon">
+            </div>
+
+        </div>
     </div>
  </template>
  
  <script>
+import { mapGetters } from 'vuex';
+
      export default {
          name: "friendsForChat",
          props: {
@@ -40,11 +54,21 @@
                  type: String,
                  required: true,
              },
-             chatId: {
-                 type: String,
-                 required: true,
-             }
-         }   
+             origin: {
+                type: Number,
+                required: true,
+             },
+             destination: {
+                type: Number,
+                required: true,
+             },
+         },
+         computed:{
+            ...mapGetters(["getUser", "getToken"])
+         },
+         methods: {
+    
+         }
      }
  </script>
  

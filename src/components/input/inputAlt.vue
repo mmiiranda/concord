@@ -32,7 +32,9 @@ export default {
             required: true
         },
         placeholder: String,
-        modelValue: String
+        modelValue: String,
+        disabled: Boolean,
+        value: String,
     }
 };
 </script>

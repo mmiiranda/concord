@@ -1,7 +1,7 @@
 <template>
   <div class="bg-cleangray h-dvh flex overflow-hidden">
     <sideBar />
-    <div class="text-white">
+    <div class="text-white w-full">
       <MainContent />
     </div>
     <footerConfig />  
@@ -19,7 +19,6 @@ export default {
     sideBar,
     MainContent,
     footerConfig,
-    
   }
   
 }

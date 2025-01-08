@@ -1,7 +1,7 @@
 <template>
     <ModalOverlay>
-        <div class="flex flex-col bg-darkblue text-white py-4 px-5 rounded shadow">
-            <h2 class="text-white font-bold text-2xl">Criar Servidor</h2>
+        <div class="max-w-2/5 w-auto lg:min-w-96 flex flex-col bg-darkblue text-white py-4 px-5 rounded shadow text-center">
+            <h2 class="text-white font-bold text-3xl">Criar Servidor</h2>
             <form @submit.prevent="createServer" class="flex flex-col gap-5 mt-4 items-center">
                 
                 <fileAlt 
@@ -20,7 +20,7 @@
                     placeholder="Insira o nome do Server"
                 />
 
-                <div class="flex w-full justify-center gap-4">
+                <div class="flex  justify-center gap-4 w-4/5">
                     <borderButton 
                         class="w-full text-red border-red px-1 py-1" 
                         type="button" 
@@ -40,11 +40,12 @@
 </template>
 
 <script>
-import inputAlt from "@/components/input/inputAlt.vue"
-import buttonAlt from "@/components/input/buttonAlt.vue"
-import borderButton from "@/components/input/borderButton.vue"
-import fileAlt from "@/components/input/fileAlt.vue"
-import ModalOverlay from "@/components/modal/modalOverlay.vue"
+import { mapGetters } from "vuex";
+import inputAlt from "@/components/input/inputAlt.vue";
+import buttonAlt from "@/components/input/buttonAlt.vue";
+import borderButton from "@/components/input/borderButton.vue";
+import fileAlt from "@/components/input/fileAlt.vue";
+import ModalOverlay from "@/components/modal/modalOverlay.vue";
 
 export default {
     name: "CreateServer",
@@ -61,6 +62,9 @@ export default {
             imageTempPath: null
         };
     },
+    computed: {
+        ...mapGetters(["getUser", "getToken"])
+    },
     emits: ["close", "serverCreated"], 
     methods: {
         closeModal() {
@@ -75,22 +79,20 @@ export default {
         async createServer() {
             await this.$nextTick();
 
-            const userSettings = localStorage.getItem("UserSetting");
-            if (!userSettings) {
-                console.error("Erro: Configurações do usuário não encontradas no localStorage.");
+            if (!this.getUser) {
+                console.error("Erro: Configurações do usuário não encontradas.");
                 return;
             }
 
-            const user = JSON.parse(userSettings);
-            const ownerId = user.id;
+            const ownerId = this.getUser.id;
 
             console.log("Tentando criar servidor com os seguintes dados:");
             console.log("Nome do Servidor:", this.serverName);
             console.log("Imagem Temporária (UUID):", this.imageTempPath);
             console.log("Dono (ownerId):", ownerId);
 
-            if (!this.serverName || !this.imageTempPath) {
-                console.error("Erro: Nome do servidor ou imagem não informados.");
+            if (!this.serverName) {
+                this.$toast("Erro: Nome do servidor não informado", "error");
                 return;
             }
 
@@ -100,14 +102,12 @@ export default {
                 imageTempPath: this.imageTempPath
             };
 
-            const token = localStorage.getItem("token");
-
             try {
                 const response = await fetch("http://localhost:8080/api/servers", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
+                        "Authorization": `Bearer ${this.getToken}`
                     },
                     body: JSON.stringify(requestBody)
                 });
@@ -120,9 +120,7 @@ export default {
                 console.log("Servidor criado com sucesso:", data);
 
                 this.$emit("serverCreated");
-
-                this.closeModal(); 
-
+                this.closeModal();
             } catch (error) {
                 console.error("Erro ao criar servidor:", error);
             }

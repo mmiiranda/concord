@@ -1,5 +1,6 @@
 <template>
    <div>
+      <p class="text-gray text-xs"> {{ label }} </p>
       <input 
          type="file" 
          :name="name"
@@ -10,7 +11,7 @@
       >
       <label 
          :for="name" 
-         class="bg-hovergray grid place-content-center rounded-full w-16 h-16 shadow-lg cursor-pointer"
+         class="border-dashed border-white border-2  grid place-content-center rounded-full w-16 h-16 shadow-lg cursor-pointer my-2"
       >
          <img 
             :src="previewImage || defaultIcon" 
@@ -18,7 +19,6 @@
             class="w-full h-full object-cover rounded-full"
          >
       </label>
-      <p class="text-gray text-xs"> {{ label }} </p>
    </div>
 </template>
 

@@ -54,7 +54,7 @@ export default {
         };
     },
     methods: {
-        ...mapActions(["toogleLoading"]),
+        ...mapActions(["toogleLoading", "login"]),
         toggleForgetModal() {
             this.ForgetModalOpen = !this.ForgetModalOpen;
         },
@@ -92,6 +92,8 @@ export default {
 
                     localStorage.setItem("token", responseData.token);
                     localStorage.setItem("UserSetting", JSON.stringify(responseData.user));
+
+                    this.login()
 
                     this.$router.push("/");
                 } else {

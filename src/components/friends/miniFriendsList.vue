@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import FriendInMenu from './friendInMenu.vue';
+import FriendInMenu from './miniFriendProfile.vue';
 
     export default {
         name: "miniFriendsList",

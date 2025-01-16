@@ -14,6 +14,7 @@ module.exports = {
       ping: 'ping 1s cubic-bezier(0, 0, 0.2, 1) infinite',
       pulse: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
       bounce: 'bounce 1s infinite',
+      spawn: "spawn .3s forwards"
     },
     aria: {
       busy: 'busy="true"',
@@ -138,12 +139,12 @@ module.exports = {
       black: colors.black,
       white: colors.white,
       slate: colors.slate,
-      shadowgray: "#4B5563",
-      cleangray: "#374151",
+      cleangray: "#434343",
       darkgray: "#328ED0",
       gray: "#D9D9D9",
+      deadGray: "#283242",
       hovergray: "#273B4A",
-      darkblue: "#1F2937",
+      darkblue: "#202020",
       zinc: colors.zinc,
       neutral: colors.neutral,
       stone: colors.stone,
@@ -152,7 +153,7 @@ module.exports = {
       amber: colors.amber,
       yellow: colors.yellow,
       lime: colors.lime,
-      green: "#00C417",
+      green: "#308F3B",
       emerald: colors.emerald,
       teal: colors.teal,
       cyan: colors.cyan,
@@ -165,6 +166,7 @@ module.exports = {
       fuchsia: colors.fuchsia,
       pink: colors.pink,
       rose: colors.rose,
+      deadgreen: "#4a9753",
     }),
     columns: {
       auto: 'auto',
@@ -600,6 +602,16 @@ module.exports = {
           animationTimingFunction: 'cubic-bezier(0,0,0.2,1)',
         },
       },
+      spawn: {
+        '0%':{
+          transform: 'translateY(-16px)',
+          opacity: "0" 
+        },
+        '100%':{
+          transform: 'translateY(0)',
+          opacity: "1" 
+        }
+      }
     },
     letterSpacing: {
       tighter: '-0.05em',
@@ -1067,4 +1079,3 @@ module.exports = {
   },
   plugins: [],
 }
-

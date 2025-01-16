@@ -1,5 +1,5 @@
 <template>
-    <div class="flex w-full bg-shadowgray p-3 gap-2 justify-between">
+    <div class="flex w-full bg-[#4a4a4a] p-3 gap-2 justify-between">
         <PopupComp 
             :visible="fileUpdateContent"
             @close="closeFileUpdatePopup"
@@ -25,8 +25,10 @@
                 </button>
             </div>
             <textarea
+                ref="messageInput"
                 v-model="message"
                 @input="adjustHeight"
+                @keydown="handleKeydown"
                 class="border-none bg-transparent outline-none w-full resize-none overflow-hidden"
                 placeholder="Escreva uma mensagem"
                 rows="1"
@@ -56,7 +58,6 @@ export default {
             message: "",
             fileUpdateContent: false,
             audioRecoderContent: false,
-            selectedFile: null, // Propriedade para rastrear o arquivo selecionado
         };
     },
     components: {
@@ -65,10 +66,12 @@ export default {
         PopupFormFile
     },
     methods: {
-        adjustHeight(event) {
-            const textarea = event.target;
-            textarea.style.height = "auto";
-            textarea.style.height = `${textarea.scrollHeight}px`;
+        adjustHeight() {
+            this.$nextTick(() => {
+                const textarea = this.$refs.messageInput;
+                textarea.style.height = "auto";
+                textarea.style.height = `${textarea.scrollHeight}px`;
+            });
         },
         openFileUpdatePopup() {
             this.fileUpdateContent = true;
@@ -87,20 +90,25 @@ export default {
             this.$refs.midiaRecorderRef.startRecording();
         },
         handleSubmit() {
-            // Aqui você verifica se há um arquivo selecionado e exclui
-            if (this.selectedFile) {
-                this.deleteSelectedFile();
-            }
-            this.message = ""; // Limpa a mensagem após o envio
+            if (!this.message.trim()) return;
+            this.$emit("sendMessage", this.message.trim());
+            this.message = "";
+            this.$nextTick(() => {
+                this.adjustHeight();
+            });
         },
-        deleteSelectedFile() {
-            this.selectedFile = null; // Simula a exclusão do arquivo
-            console.log("Arquivo excluído.");
+        handleKeydown(event) {
+            if (event.key === "Enter") {
+                if (event.shiftKey) {
+                    return;
+                }
+                event.preventDefault();
+                this.handleSubmit();
+            }
         }
     },
 };
 </script>
-
 
 <style>
 textarea::placeholder {

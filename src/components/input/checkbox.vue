@@ -1,10 +1,13 @@
 <template>
-        <input type="checkbox" 
-        :name="name"
-        class="border-gray bg-darkblue" />
-        <label :for="name">
-            {{ label }}
-        </label>
+    <div>
+        <input
+            type="checkbox"
+            :name="name"
+            class="border-gray bg-darkblue"
+            v-bind="$attrs"
+        />
+        <label :for="name">{{ label }}</label>
+    </div>
 </template>
 
 <script>

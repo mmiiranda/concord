@@ -1,7 +1,7 @@
 <template>
     <div 
     :class="[
-      'fixed bg-darkblue text-white w-full flex h-screen',
+      'fixed bg-[#262626] text-white w-full flex h-screen',
       isPageOptionOpen ? 'mt-0' : 'mt-[90vh]'
     ]">
         <headerFooter 

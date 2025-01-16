@@ -1,8 +1,8 @@
 <template>
   <div class="bg-cleangray h-dvh flex">
-    <div class="h-full w-full xl:w-5/12 bg-darkblue text-white flex flex-col justify-center items-center p-12">
+    <div class="h-full w-full xl:w-5/12 bg-darkblue text-white flex flex-col justify-center items-center lg:p-12 p-6">
       <LoginForm v-if="Isregister == 0"/>
-      <RegisterForm v-else/>
+      <RegisterForm @loading="toogleLoading" v-else/>
       <div class="text-white mt-6">
         <div v-if="Isregister == 0">
           Não tem uma conta? <span class="text-blue cursor-pointer" @click="toogleForm">Registre-se</span>
@@ -22,22 +22,25 @@
 <script>
 import LoginForm from "@/components/form/Login.vue";
 import RegisterForm from "@/components/form/Register.vue";
+import { mapActions } from "vuex";
+
 
     export default {
-        name: "LoginView",
+        name: "LoginView", 
         data(){
           return{
-            Isregister: 0
+            Isregister: 0, 
           }
         },
         methods: {
+          ...mapActions(["toogleLoading"]),
           toogleForm(){
             this.Isregister = !this.Isregister
-          }
+          },
         },
         components: {
           LoginForm,
-          RegisterForm
+          RegisterForm,
         }
     }
 </script>

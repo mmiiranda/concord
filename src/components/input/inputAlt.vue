@@ -1,14 +1,15 @@
 <template>
     <div>
-        <label :for="name">
-            {{ label }}
-        </label>
-        <input 
-            :type="type" 
+        <label :for="id">{{ label }}</label>
+        <input
+            v-bind="$attrs"
             :id="id"
             :name="name"
-            :placeholder="placeholder"
+            :type="type"
             class="bg-black w-full p-2 text-white outline-none rounded"
+            :placeholder="placeholder"
+            :value="modelValue"
+            @input="$emit('update:modelValue', $event.target.value)"
         />
     </div>
 </template>
@@ -30,7 +31,10 @@ export default {
             type: String,
             required: true
         },
-        placeholder: String
+        placeholder: String,
+        modelValue: String,
+        disabled: Boolean,
+        value: String,
     }
 };
 </script>

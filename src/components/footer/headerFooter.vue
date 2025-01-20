@@ -2,7 +2,7 @@
     <div class="h-[10vh] w-full flex justify-between items-center px-8">
         <div class="flex gap-4">
             <toogleIconButton src="Bell.svg"/>
-            <userProfile name="Pablo" username="reboloerrado" src="https://i.scdn.co/image/ab67616d0000b2738c46c9a59ac57eeb959d064e" />
+            <userProfile name="Pablo" username="reboloerrado" :src="getUser.id || 'no-photo.jpg'" />
         </div>
         <div>
             <div class="flex ">
@@ -22,6 +22,8 @@ import userProfile from "../user/userProfile.vue"
 import micIcon from "../icon/mic.svg"
 import headphoneIcon from "../icon/headphone.svg"
 import configIcon from "../icon/config.svg"
+import { mapGetters } from 'vuex';
+
 
     export default {
         name: "headerFooter",
@@ -35,6 +37,7 @@ import configIcon from "../icon/config.svg"
         };
         },
         methods: {
+            ...mapGetters(["getToken", "getUser"]),
             emitToogleConfig(){
                 this.$emit("toogleConfig")
             }

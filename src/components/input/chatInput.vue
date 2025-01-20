@@ -70,7 +70,7 @@ export default {
             this.$nextTick(() => {
                 const textarea = this.$refs.messageInput;
                 textarea.style.height = "auto";
-                textarea.style.height = `${textarea.scrollHeight}px`;
+                textarea.style.height =  textarea.scrollHeight  < 500 ? `${textarea.scrollHeight}px` : `${500}px`;
             });
         },
         openFileUpdatePopup() {

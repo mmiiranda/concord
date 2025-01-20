@@ -1,12 +1,13 @@
+
 class WebSocketService {
   constructor() {
     this.socket = null;
-    this.messageQueue = []; // Fila para mensagens antes do CONNECT
-    this.isConnected = false; // Indicador de conexão autenticada
-    this.messageHandlers = [];
+    this.messageQueue = [];
+    this.isConnected = false;
     this.openHandlers = [];
     this.closeHandlers = [];
     this.errorHandlers = [];
+    this.messageHandlers = [];
     this.token = null;
   }
 
@@ -26,16 +27,11 @@ class WebSocketService {
 
     this.socket = new WebSocket("ws://localhost:8080/ws");
 
-    // Quando a conexão é aberta
     this.socket.onopen = () => {
       console.log("✅ WebSocket conectado com sucesso!");
-      this._sendConnectMessage(); // Envia o evento CONNECT
-      this.isConnected = true; // Marca conexão como autenticada
-      this._flushMessageQueue(); // Processa mensagens pendentes
-      this.openHandlers.forEach((handler) => handler());
+      this._sendConnectMessage();
     };
 
-    // Quando uma mensagem é recebida
     this.socket.onmessage = (event) => {
       try {
         const message = JSON.parse(event.data);
@@ -46,18 +42,16 @@ class WebSocketService {
       }
     };
 
-    // Quando a conexão é encerrada
     this.socket.onclose = (event) => {
       console.warn("❌ WebSocket desconectado:", {
         code: event.code,
         reason: event.reason,
         wasClean: event.wasClean,
       });
-      this.isConnected = false; // Resetar indicador de conexão
+      this.isConnected = false;
       this.closeHandlers.forEach((handler) => handler());
     };
 
-    // Quando ocorre um erro
     this.socket.onerror = (error) => {
       console.error("⚠️ Erro no WebSocket:", error);
       this.errorHandlers.forEach((handler) => handler(error));
@@ -74,8 +68,12 @@ class WebSocketService {
       };
 
       console.log("📤 Enviando mensagem CONNECT:", connectMessage);
-      console.log("🛠️ Estrutura JSON CONNECT enviada:", JSON.stringify(connectMessage, null, 2));
       this.socket.send(JSON.stringify(connectMessage));
+
+      // Definir isConnected como true após enviar CONNECT
+      this.isConnected = true;
+      this._flushMessageQueue();
+      this.openHandlers.forEach((handler) => handler());
     } else {
       console.error("⚠️ WebSocket não está conectado. Não foi possível enviar CONNECT.");
     }
@@ -98,26 +96,23 @@ class WebSocketService {
     }
   }
 
+
   sendMessage(message) {
-    // Se ainda não conectou (CONNECT não foi enviado), faz fila
     if (!this.isConnected) {
-      console.warn("🔄 CONNECT ainda não enviado. Adicionando mensagem à fila:", message);
+      console.warn("🔄 WebSocket não está conectado. Adicionando mensagem à fila:", message);
       this.messageQueue.push(message);
       return;
     }
 
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
       console.log("📤 Enviando mensagem pelo WebSocket:", message);
-      // Aqui fazemos o JSON.stringify APENAS uma vez
       this.socket.send(JSON.stringify(message));
+      console.log("📤 Mensagem enviada pelo WebSocket.");
     } else {
       console.error("⚠️ WebSocket não está conectado. Mensagem não enviada:", message);
     }
   }
 
-  onMessage(handler) {
-    this.messageHandlers.push(handler);
-  }
 
   onOpen(handler) {
     this.openHandlers.push(handler);
@@ -129,6 +124,10 @@ class WebSocketService {
 
   onError(handler) {
     this.errorHandlers.push(handler);
+  }
+
+  onMessage(handler) {
+    this.messageHandlers.push(handler);
   }
 }
 

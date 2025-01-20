@@ -4,27 +4,27 @@
     <div class="h-[2px] w-full bg-shadowgray"></div>
 
     <div class="h-full overflow-y-auto flex flex-col-reverse gap-2">
-      <div v-for="message in messages" :key="message.id" class="message">
+      <div v-for="message in messages" :key="message.id || message.timestamp" class="message">
         <MessageChat
-          :name="this.chatData.name"
+          :name="OwnerMessage(message.fromUserId)"
           :date="formatDate(message.timestamp)"
           :hour="formatHour(message.timestamp)"
-          :src="this.chatData.imagePath || 'no-photo.jpg'"
+          :src="message.senderAvatar || 'no-photo.jpg'"
           :message="message.content"
         />
       </div>
     </div>
 
-    <form class="relative" @submit.prevent="sendMessageHandler">
+    <div class="relative" >
       <ChatInput @sendMessage="sendMessageHandler" />
-    </form>
+    </div>
   </div>
 </template>
 
 <script>
 import MessageChat from "./messageChat.vue";
 import ChatInput from "../input/chatInput.vue";
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
   name: "ChatContent",
@@ -38,16 +38,9 @@ export default {
       required: true,
     },
   },
-  data() {
-    return {
-      messages: [],
-      loading: false,
-      currentPage: 0,
-      totalPages: 1,
-    };
-  },
   computed: {
     ...mapGetters(["getToken", "getUser"]),
+    ...mapGetters("websocket", ["messages", "isConnected"]),
     chatTitle() {
       return this.chatData.type === "server"
         ? `Canal: ${this.chatData.name}`
@@ -55,53 +48,7 @@ export default {
     },
   },
   methods: {
-    async fetchChatMessages(page = 0, size = 10) {
-      this.loading = true;
-
-      const token = this.getToken;
-      const user = this.getUser;
-
-      if (!user || !user.id) {
-        console.error("Usuário não autenticado ou ID do usuário não encontrado.");
-        this.loading = false;
-        return;
-      }
-
-      const endpoint = `http://localhost:8080/api/messages/chat?toUserId=${this.chatData.id}&fromUserId=${user.id}&page=${page}&size=${size}`;
-      try {
-        const response = await fetch(endpoint, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Erro ao buscar mensagens.");
-        }
-
-        const data = await response.json();
-        if (page === 0) {
-          // Primeira página
-          this.messages = data.content.reverse();
-        } else {
-          // Concatenar mais mensagens
-          this.messages = [...this.messages, ...data.content.reverse()];
-        }
-        this.totalPages = data.totalPages;
-        this.currentPage = data.number;
-      } catch (error) {
-        console.error("Erro ao carregar mensagens:", error);
-      } finally {
-        this.loading = false;
-      }
-    },
-
-    async loadMoreMessages() {
-      if (this.currentPage + 1 < this.totalPages) {
-        await this.fetchChatMessages(this.currentPage + 1);
-      }
-    },
+    ...mapActions("websocket", ["sendMessage", "fetchChatMessages"]),
 
     sendMessageHandler(messageContent) {
       const user = this.getUser;
@@ -112,23 +59,11 @@ export default {
         return;
       }
 
-      // Verificar se o WebSocket está conectado
-      if (!this.$store.getters["websocket/isConnected"]) {
+      if (!this.isConnected) {
         console.error("WebSocket não está conectado.");
         return;
       }
 
-      // Exemplo de mensagem extra (se quiser mandar info do token junto)
-      // Mas CUIDADO: pode não ser necessário ou o servidor pode não esperar esse payload.
-      const extraTokenMessage = {
-        eventType: "USER_MESSAGE",
-        content: {
-          token: token, // ou localStorage.getItem("token")
-        },
-      };
-      this.$store.dispatch("websocket/sendMessage", extraTokenMessage);
-
-      // Mensagem real de usuário
       const messagePayload = {
         eventType: "USER_MESSAGE",
         content: {
@@ -136,48 +71,48 @@ export default {
           toUserId: this.chatData.id,
         },
       };
-      this.$store.dispatch("websocket/sendMessage", messagePayload);
 
-      // Exibir localmente como "Enviando..."
-      const timestamp = new Date().toISOString();
-      const newMessage = {
-        id: Date.now(),
-        senderName: "Você",
-        timestamp,
-        senderAvatar: user.avatar || "no-photo.jpg",
-        content: messageContent,
-        status: "Enviando...",
-      };
-      this.messages.unshift(newMessage);
-
-      // Simular envio e atualizar status
-      setTimeout(() => {
-        const index = this.messages.findIndex((msg) => msg.id === newMessage.id);
-        if (index !== -1) {
-          this.messages[index].status = "✓ Enviado";
-        }
-      }, 1000);
+      console.log("📝 Enviando payload da mensagem:", messagePayload);
+      this.sendMessage(messagePayload);
+      this.message = '';
     },
 
     formatDate(timestamp) {
-      // formate a data real aqui
-      return timestamp;
+      if (!timestamp) return '';
+      const date = new Date(timestamp);
+      return date.toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric',
+      });
     },
 
     formatHour(timestamp) {
-      // formate a hora real aqui
-      return timestamp;
+      if (!timestamp) return '';
+      const date = new Date(timestamp);
+      return date.toLocaleTimeString(undefined, {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      });
     },
+
+    OwnerMessage(id){
+      return id == this.getUser.id ? this.getUser.username : this.chatData.name
+    }
   },
 
   watch: {
-    // Sempre que trocar de chat, zera as mensagens e carrega de novo
     chatData: {
       immediate: true,
       handler() {
-        this.messages = [];
-        this.currentPage = 0;
-        this.fetchChatMessages();
+        this.$store.commit("websocket/SET_MESSAGES", []); // Zera as mensagens no Vuex
+        this.fetchChatMessages({
+          toUserId: this.chatData.id,
+          fromUserId: this.getUser.id,
+          page: 0,
+          size: 20,
+        });
       },
     },
   },

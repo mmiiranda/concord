@@ -58,7 +58,6 @@ export default createStore({
       commit("UPDATE_LOCALHOST");
       const token = localStorage.getItem("token");
 
-      // Conecta ao WebSocket logo após o login
       if (token) {
         dispatch("websocket/connectWebSocket", token, { root: true });
         console.log("✅ WebSocket conectado após login.");

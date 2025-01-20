@@ -1,7 +1,7 @@
-// src/store/index.js
 import { createStore } from "vuex";
 import chatModule from "./chat";
-import websocket from "./websocket"; // módulo do WebSocket
+import websocket from "./websocket"; 
+import rightsidebar from './rightsidebar'; // Importando corretamente
 
 export default createStore({
   state: {
@@ -16,8 +16,16 @@ export default createStore({
     getUser: (state) => state.user,
     getToken: (state) => state.token,
     getFriends: (state) => state.friendsList,
-    getServers: (state) => state.serversList,
-    isLoggedIn: (state) => !!state.token
+    getServers: (state) => state.serversList, // Adicione esta linha
+    isLoggedIn: (state) => !!state.token,
+  
+    // Getter para listar amigos com mensagens pendentes
+    getFriendsWithPendingMessages: (state, getters, rootState, rootGetters) => {
+      const unreadChats = rootGetters["websocket/unreadChats"];
+      return state.friendsList.filter(friend => 
+        unreadChats.some(chat => chat.fromUserId === friend.id && chat.unreadMessagesCount > 0)
+      );
+    }
   },
   mutations: {
     TOOGLE_LOADING(state) {
@@ -121,6 +129,7 @@ export default createStore({
   },
   modules: {
     chat: chatModule,
-    websocket
+    websocket,
+    rightsidebar // Registrando o módulo com o namespace correto
   }
 });

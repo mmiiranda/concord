@@ -3,7 +3,8 @@
     <sideBar />
     <div class="text-white w-full">
       <MainContent v-if="!activeChat"/>  
-      <ChatContent v-else :chatData="activeChat"/> 
+      <ChatContent v-else :chatData="activeChat"/>
+      <RightSideBar /> 
       <WsTst /> 
     </div>
     <footerConfig />  
@@ -17,6 +18,7 @@ import footerConfig from "@/components/footer/footerConfig.vue";
 import ChatContent from "@/components/chat/chatContent.vue";
 import { mapActions, mapGetters } from "vuex";
 import WsTst from "@/components/wsTest/wsTst.vue";
+import RightSideBar from "@/components/sideBar/rightSideBar.vue";
 
 export default {
   name: "MainView",
@@ -25,6 +27,7 @@ export default {
     footerConfig,
     ChatContent,
     MainContent,
+    RightSideBar,
     WsTst
   },
   computed: {

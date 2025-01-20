@@ -3,8 +3,12 @@
     <h2 class="font-bold text-lg">{{ chatTitle }}</h2>
     <div class="h-[2px] w-full bg-shadowgray"></div>
 
-    <div class="h-full overflow-y-auto flex flex-col-reverse gap-2">
-      <div v-for="message in messages" :key="message.id || message.timestamp" class="message">
+    <div 
+      ref="messageContainer"
+      class="h-full overflow-y-auto flex flex-col justify-end gap-2"
+      @scroll="handleScroll"
+    >
+      <div v-for="message in reversedMessages" :key="message.id || message.timestamp" class="message">
         <MessageChat
           :name="OwnerMessage(message.fromUserId)"
           :date="formatDate(message.timestamp)"
@@ -15,7 +19,7 @@
       </div>
     </div>
 
-    <div class="relative" >
+    <div class="relative">
       <ChatInput @sendMessage="sendMessageHandler" />
     </div>
   </div>
@@ -38,6 +42,12 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      isLoadingMore: false, // Evita múltiplos carregamentos ao rolar para cima
+      currentPage: 0,       // Página atual de mensagens carregadas
+    };
+  },
   computed: {
     ...mapGetters(["getToken", "getUser"]),
     ...mapGetters("websocket", ["messages", "isConnected"]),
@@ -45,6 +55,9 @@ export default {
       return this.chatData.type === "server"
         ? `Canal: ${this.chatData.name}`
         : `DM com: ${this.chatData.name}`;
+    },
+    reversedMessages() {
+      return [...this.messages].reverse(); // Inverte as mensagens para exibição
     },
   },
   methods: {
@@ -74,7 +87,6 @@ export default {
 
       console.log("📝 Enviando payload da mensagem:", messagePayload);
       this.sendMessage(messagePayload);
-      this.message = '';
     },
 
     formatDate(timestamp) {
@@ -97,43 +109,46 @@ export default {
       });
     },
 
-    OwnerMessage(id){
-      return id == this.getUser.id ? this.getUser.username : this.chatData.name
-    }
+    OwnerMessage(id) {
+      return id == this.getUser.id ? this.getUser.username : this.chatData.name;
+    },
+
+    handleScroll() {
+      const container = this.$refs.messageContainer;
+
+      if (container.scrollTop === 0 && !this.isLoadingMore) {
+        this.isLoadingMore = true;
+        this.currentPage += 1;
+
+        this.fetchChatMessages({
+          toUserId: this.chatData.id,
+          fromUserId: this.getUser.id,
+          page: this.currentPage,
+          size: 20,
+        }).then(() => {
+          this.isLoadingMore = false;
+        });
+      }
+    },
+
   },
 
   watch: {
     chatData: {
       immediate: true,
       handler() {
+        this.currentPage = 0; // Reinicia a página ao trocar de chat
         this.$store.commit("websocket/SET_MESSAGES", []); // Zera as mensagens no Vuex
+
         this.fetchChatMessages({
           toUserId: this.chatData.id,
           fromUserId: this.getUser.id,
           page: 0,
           size: 20,
-        });
+        })
       },
     },
   },
+
 };
 </script>
-
-<style scoped>
-.status {
-  font-size: 0.8rem;
-  color: gray;
-  margin-left: 8px;
-}
-.load-more button {
-  background-color: #5865f2;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-.load-more button:hover {
-  background-color: #4752c4;
-}
-</style>

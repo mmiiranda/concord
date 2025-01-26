@@ -1,16 +1,16 @@
 <template>
-  <div class="bg-sidebar h-full w-60 flex flex-col text-white">
+  <div class="h-full w-60 flex flex-col text-white">
 
     <div v-if="!activeChat || activeChat.type === 'dm'">
-      <h2 class="text-lg font-bold px-4 py-2">Amigos</h2>
+      <h2 class="text-lg font-bold px-4 py-2 bg-darkblue">Friends</h2>
       <ul>
         <li
           v-for="friend in friendsList"
           :key="friend.id"
-          class="cursor-pointer px-4 py-2 hover:bg-gray-700"
+          class="cursor-pointer px-4 py-2 hover:bg-gray/10"
           @click="openDm(friend)"
         >
-          {{ friend.username }}
+          <MiniFriendProfile :name="friend.username" src="no-photo.jpg" />
         </li>
       </ul>
     </div>
@@ -32,14 +32,16 @@
 </template>
 
 <script>
+import MiniFriendProfile from "@/components/friends/miniFriendProfile.vue";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
   name: "SideBar",
+  components: {
+    MiniFriendProfile
+  },
   computed: {
-    // lista de amigos e servers vindas do store raiz
     ...mapGetters(["getFriends", "getServers"]),
-    // activeChat (do módulo chat)
     ...mapGetters("chat", ["getActiveChat"]),
 
     friendsList() {
@@ -50,13 +52,11 @@ export default {
     }
   },
   methods: {
-    // actions do módulo chat
     ...mapActions("chat", ["setActiveChat"]),
 
-    // Exemplo: obter os canais do servidor pelo ID do servidor
+
     channelsFromServer(serverId) {
       const server = this.getServers.find((sv) => sv.id === serverId);
-      // Ajuste conforme a forma como seus servers/canais são armazenados
       return server && server.channels ? server.channels : [];
     },
 
@@ -64,7 +64,7 @@ export default {
       this.setActiveChat({
         id: friend.id,
         name: friend.username,
-        type: "dm" // Indica que é chat direto
+        type: "dm" 
       });
     },
 
@@ -73,8 +73,13 @@ export default {
         id: channel.id,
         name: channel.name,
         serverId: channel.serverId,
-        type: "server" // Indica que é chat de servidor
+        type: "server" 
       });
+    },
+    
+    getImage(imagePath){
+      console.log(imagePath)
+      return imagePath ? `http://localhost:8080/api/files/images?file-id=${imagePath}`: "no-photo.jpg";
     }
   }
 };

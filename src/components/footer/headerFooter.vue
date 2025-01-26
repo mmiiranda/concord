@@ -1,14 +1,14 @@
 <template>
-    <div class="h-[10vh] w-full flex justify-between items-center px-8">
+    <div class="h-[10vh] bg-darkblue w-full flex justify-between items-center px-8">
         <div class="flex gap-4">
             <toogleIconButton src="Bell.svg"/>
-            <userProfile name="Pablo" username="reboloerrado" :src="getUser.id || 'no-photo.jpg'" />
+            <userProfile />
         </div>
         <div>
             <div class="flex ">
                 <toogleIconButton :src="icons.micIcon"/>
                 <toogleIconButton :src="icons.headphoneIcon"/>
-                <toogleIconButton  
+                <toogleIconButton       
                 @click="emitToogleConfig"
                 :src="icons.configIcon"/>
             </div>
@@ -36,8 +36,10 @@ import { mapGetters } from 'vuex';
             }
         };
         },
-        methods: {
+        computed:{
             ...mapGetters(["getToken", "getUser"]),
+        },
+        methods: {
             emitToogleConfig(){
                 this.$emit("toogleConfig")
             }

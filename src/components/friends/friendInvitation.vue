@@ -23,7 +23,7 @@
             <button class="rounded-full bg-darkblue w-6 h-6 grid place-items-center
             cursor-pointer"
             v-show="origin != getUser.id"
-            data-value="ACCEPTED"
+            data-value="accept"
             type="submit"
             >
                 <img 
@@ -34,7 +34,7 @@
             </button>
             <button class="rounded-full bg-darkblue w-6 h-6 grid place-items-center
             cursor-pointer"
-            data-value="DENIED"
+            data-value="deny"
             type="submit"
             >
                 <img src="../icon/close.svg" 
@@ -88,24 +88,17 @@ import { mapGetters } from 'vuex';
                 try{
                     const value = event.submitter.getAttribute("data-value");   
 
-                    const requestBody = {
-                                id: this.id,
-                                status: value
-                        }
-
-                    const response = await fetch(`http://localhost:8080/api/friendships/${this.id}`,{
-                            method: 'PUT',
+                    const response = await fetch(`http://localhost:8080/api/friendships/${this.id}/${value}`,{
+                            method: 'PATCH',
                             headers: {
                             "Content-Type": "application/json",
                             "Authorization": `Bearer ${this.getToken}`
-                            },
-                            body: JSON.stringify(requestBody)
+                            }
                         }
                     )  
 
                     this.$emit("submited")
 
-                    console.log(requestBody)
                     console.log(response)
                     
                 }catch(err){    

@@ -11,10 +11,12 @@
       >
       <label 
          :for="name" 
-         class="border-dashed border-white border-2  grid place-content-center rounded-full w-16 h-16 shadow-lg cursor-pointer my-2"
+         class="border-dashed border-white border-2 grid place-content-center rounded-full w-24 h-24 shadow-lg cursor-pointer my-2"
+         @mouseover="showIcon = true"
+         @mouseleave="showIcon = false"
       >
          <img 
-            :src="previewImage || defaultIcon" 
+            :src="showIcon ? defaultIcon : (placeholderImage ||previewImage)" 
             alt="Selected Image" 
             class="w-full h-full object-cover rounded-full"
          >
@@ -36,12 +38,17 @@ export default {
          type: String,
          default: ""   
       },
-      label: String
+      label: String,
+      placeholderImage: {
+         type: String,
+         default: null // Caso não seja fornecida, mantém o estado atual
+      }
    },
    data() {
       return {
-         previewImage: null,
-         defaultIcon, 
+         previewImage: defaultIcon,
+         defaultIcon,
+         showIcon: false, // Controla a exibição do ícone ao passar o mouse
       };
    },
    methods: {

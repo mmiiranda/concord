@@ -1,3 +1,4 @@
+
 <template>
     <div class="flex gap-1">
         <div class="flex items-center">
@@ -53,7 +54,7 @@ export default {
             if (this.user.imagePath) {
                 return `http://localhost:8080/uploads/${this.user.imagePath}`; 
             }
-            return this.defaultImage;
+            return 'no-photo.jpg';
         }
     }
 };

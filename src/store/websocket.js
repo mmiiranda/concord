@@ -21,7 +21,7 @@ const mutations = {
     if (!exists) {
       state.messages.unshift(message);
     } else {
-      console.log("⚠️ Mensagem duplicada ignorada:", message.id);
+      console.log("⚠️ Mensagem duplicada ignorada:", message.id); 
     }
   },
   SET_UNREAD_CHATS(state, unreadChats) {
@@ -33,7 +33,7 @@ const mutations = {
 };
 
 const actions = {
-  connectWebSocket({ commit, rootGetters, state }, token) {
+  connectWebSocket({ commit, rootGetters, state, dispatch }, token) {
     if (state.isConnected) {
       console.log("⚠️ WebSocket já está conectado.");
       return;
@@ -63,34 +63,30 @@ const actions = {
     WebSocketService.onMessage((message) => {
       if (message.eventType === "USER_MESSAGE") {
         const user = rootGetters["getUser"];
+        const activeChat = rootGetters["chat/getActiveChat"];
+    
+        // Monta a estrutura da mensagem para exibir
         const newMsg = {
           id: message.content.id || message.content.timestamp,
           timestamp: message.content.timestamp || new Date().toISOString(),
-          senderName: message.content.fromUserId === user.id ? "Você" : "Outro Usuário",
           senderAvatar: message.content.senderAvatar || "no-photo.jpg",
           content: message.content.message,
         };
         commit("ADD_MESSAGE", newMsg);
-
-        if (message.content.toUserId === user.id && !message.content.isRead) {
-          const activeChat = rootGetters["chat/activeChat"];
-
-          console.log("Recebendo mensagem:");
-          console.log("fromUserId:", message.content.fromUserId, typeof message.content.fromUserId);
-          console.log("activeChat.id:", activeChat ? activeChat.id : null, activeChat ? typeof activeChat.id : null);
-
-          const isActiveChat =
-            activeChat &&
-            activeChat.type === "dm" &&
-            Number(activeChat.id) === Number(message.content.fromUserId); // Conversão para número
-
-          console.log("isActiveChat:", isActiveChat);
-
-          if (!isActiveChat) {
-            const existingChat = state.unreadChats.find(chat => chat.fromUserId === message.content.fromUserId);
+    
+        // Se a mensagem é para mim
+        if (message.content.toUserId === user.id) {
+          if (
+            !activeChat ||
+            activeChat.id !== message.content.fromUserId ||
+            activeChat.type === "server"
+          ) {
+            // Incrementa unread
+            const existingChat = state.unreadChats.find(
+              chat => chat.fromUserId === message.content.fromUserId
+            );
             if (existingChat) {
               existingChat.unreadMessagesCount += 1;
-              existingChat.latestMessageTimestamp = message.content.timestamp;
             } else {
               state.unreadChats.push({
                 fromUserId: message.content.fromUserId,
@@ -100,11 +96,17 @@ const actions = {
             }
             commit("SET_UNREAD_CHATS", [...state.unreadChats]);
           } else {
-            console.log(`📖 Mensagem de ${message.content.fromUserId} recebida na conversa ativa. Não incrementando unread count.`);
+            // O chat está ativo, marca as mensagens como lidas
+            console.log(`✅ Marcando mensagens de ${message.content.fromUserId} como lidas.`);
+            dispatch("markMessagesAsRead", { fromUserId: message.content.fromUserId });
           }
         }
+      }else if(message.eventType === "FRIEND_REQUEST"){
+          console.log("not")
       }
     });
+    
+        
   },
 
   disconnectWebSocket({ commit }) {
@@ -247,6 +249,7 @@ const getters = {
   messages: (state) => state.messages,
   unreadChats: (state) => state.unreadChats,
   users: (state) => state.users,
+  activeChat: (_, __, rootState) => rootState.chat.activeChat, // Retorna o chat ativo
 };
 
 export default {

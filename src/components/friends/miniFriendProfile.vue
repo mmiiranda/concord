@@ -3,7 +3,6 @@
         , newMessage ? 'opacity-100' : 'opacity-80']">
         <div class="w-5 h-5 rounded-full
         grid place-items-center overflow-hidden bg-darkblue">
-            <span class="text-sm"> {{ name[0].toUpperCase() }} </span>
             <img 
             class="w-full h-full object-cover"
             :src="src">

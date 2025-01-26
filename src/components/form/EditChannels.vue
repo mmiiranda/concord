@@ -27,7 +27,6 @@ import ActionBox from '../input/ActionBox.vue';
 import ChatIcon from "../icon/chat_icon.svg"
 import TrashIcon from "../icon/trash.svg"
 
-
     export default {
         name: "EditChannels",
         data(){

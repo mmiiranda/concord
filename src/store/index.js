@@ -22,10 +22,20 @@ export default createStore({
     // Getter para listar amigos com mensagens pendentes
     getFriendsWithPendingMessages: (state, getters, rootState, rootGetters) => {
       const unreadChats = rootGetters["websocket/unreadChats"];
-      return state.friendsList.filter(friend => 
-        unreadChats.some(chat => chat.fromUserId === friend.id && chat.unreadMessagesCount > 0)
-      );
-    }
+      const activeChat = rootGetters["chat/getActiveChat"];
+      
+      return state.friendsList.filter(friend => {
+        // Se o chat ativo for DM e tiver o mesmo ID, ignora
+        if (activeChat && activeChat.type !== "server" && activeChat.id === friend.id) {
+          return false;
+        }
+        // Retorna true somente se encontrar esse amigo em unreadChats com msgs não lidas
+        return unreadChats.some(
+          chat => chat.fromUserId === friend.id && chat.unreadMessagesCount > 0
+        );
+      });
+    },
+
   },
   mutations: {
     TOOGLE_LOADING(state) {
@@ -56,6 +66,12 @@ export default createStore({
     },
     SET_SERVERS(state, servers) {
       state.serversList = servers;
+    },
+    UPDATE_USER_FIELD(state, { field, value }) {
+      if (state.user) {
+        state.user[field] = value;
+        localStorage.setItem("UserSetting", JSON.stringify(state.user));
+      }
     }
   },
   actions: {
@@ -124,6 +140,38 @@ export default createStore({
         }
       } catch (err) {
         console.error("Erro ao buscar servidores:", err);
+      }
+    },
+    async updateUser({ commit, getters }, { field, value }) {
+      try {
+        const payload = {
+          [field]: value
+        };
+
+        const response = await fetch(
+          `http://localhost:8080/api/users/${getters.getUser.username}/${field}`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${getters.getToken}`
+            },
+            body: JSON.stringify(payload)
+          }
+        );
+
+        if (response.ok) {
+          const updatedUser = await response.json();
+          console.log(updatedUser)
+          commit("SET_USER", updatedUser);
+          console.log(`✅ ${field} atualizado com sucesso.`);
+
+        } else {
+          const errorData = await response.json();
+          console.error(`Erro ao atualizar ${field}:`, errorData);
+        }
+      } catch (err) {
+        console.error(`Erro na requisição para atualizar ${field}:`, err);
       }
     }
   },

@@ -1,7 +1,6 @@
 <template>
     <div class="h-[10vh] bg-darkblue w-full flex justify-between items-center px-8">
         <div class="flex gap-4">
-            <toogleIconButton src="Bell.svg"/>
             <userProfile />
         </div>
         <div>
@@ -42,7 +41,7 @@ import { mapGetters } from 'vuex';
         methods: {
             emitToogleConfig(){
                 this.$emit("toogleConfig")
-            }
+            },
         },  
         components: {
             toogleIconButton,

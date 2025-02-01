@@ -10,13 +10,13 @@
           class="cursor-pointer px-4 py-2 hover:bg-gray/10"
           @click="openDm(friend)"
         >
-          <MiniFriendProfile :name="friend.username" src="no-photo.jpg" />
+          <MiniFriendProfile :name="friend.username" :src="friend.imagePath" />
         </li>
       </ul>
     </div>
 
     <div v-else-if="activeChat.type === 'server'">  
-      <h2 class="text-lg font-bold px-4 py-2">Canais</h2>
+      <h2 classHoje="text-lg font-bold px-4 py-2">Canais</h2>
       <ul>
         <li
           v-for="channel in channelsFromServer(activeChat.serverId)"
@@ -53,7 +53,7 @@ export default {
   },
   methods: {
     ...mapActions("chat", ["setActiveChat"]),
-
+    ...mapActions("mobile", ["closeSidebar"]),
 
     channelsFromServer(serverId) {
       const server = this.getServers.find((sv) => sv.id === serverId);
@@ -66,6 +66,7 @@ export default {
         name: friend.username,
         type: "dm" 
       });
+      this.closeSidebar()
     },
 
     openServerChannel(channel) {

@@ -1,7 +1,9 @@
 import { createStore } from "vuex";
 import chatModule from "./chat";
-import websocket from "./websocket"; 
-import rightsidebar from './rightsidebar'; // Importando corretamente
+import websocket from "./websocket";
+import rightsidebar from "./rightsidebar";
+import mobile from "./mobile"
+import router from "@/router";
 
 export default createStore({
   state: {
@@ -9,36 +11,42 @@ export default createStore({
     token: localStorage.getItem("token") || null,
     user: JSON.parse(localStorage.getItem("UserSetting")) || null,
     friendsList: [],
-    serversList: []
+    serversList: [],
+    pendingRequestsCount: 0,
+    pendingRequests: [],
   },
+
   getters: {
     isLoading: (state) => state.loading,
     getUser: (state) => state.user,
     getToken: (state) => state.token,
     getFriends: (state) => state.friendsList,
-    getServers: (state) => state.serversList, // Adicione esta linha
+    getServers: (state) => state.serversList,
     isLoggedIn: (state) => !!state.token,
-  
-    // Getter para listar amigos com mensagens pendentes
+
+    // Contador de solicitações de amizade pendentes
+    pendingRequestsCount: (state) => state.pendingRequestsCount,
+    // Lista completa de solicitações pendentes
+    getPendingRequests: (state) => state.pendingRequests,
+
+    // Amigos com mensagens pendentes (unread)
     getFriendsWithPendingMessages: (state, getters, rootState, rootGetters) => {
       const unreadChats = rootGetters["websocket/unreadChats"];
       const activeChat = rootGetters["chat/getActiveChat"];
-      
-      return state.friendsList.filter(friend => {
-        // Se o chat ativo for DM e tiver o mesmo ID, ignora
+
+      return state.friendsList.filter((friend) => {
         if (activeChat && activeChat.type !== "server" && activeChat.id === friend.id) {
           return false;
         }
-        // Retorna true somente se encontrar esse amigo em unreadChats com msgs não lidas
         return unreadChats.some(
-          chat => chat.fromUserId === friend.id && chat.unreadMessagesCount > 0
+          (chat) => chat.fromUserId === friend.id && chat.unreadMessagesCount > 0
         );
       });
     },
-
   },
+
   mutations: {
-    TOOGLE_LOADING(state) {
+    TOGGLE_LOADING(state) {
       state.loading = !state.loading;
     },
     SET_USER(state, user) {
@@ -54,12 +62,10 @@ export default createStore({
       state.token = null;
       state.friendsList = [];
       state.serversList = [];
+      state.pendingRequests = [];
+      state.pendingRequestsCount = 0;
       localStorage.removeItem("UserSetting");
       localStorage.removeItem("token");
-    },
-    UPDATE_LOCALHOST(state) {
-      state.user = JSON.parse(localStorage.getItem("UserSetting")) || null;
-      state.token = localStorage.getItem("token") || null;
     },
     SET_FRIENDS(state, friends) {
       state.friendsList = friends;
@@ -67,81 +73,118 @@ export default createStore({
     SET_SERVERS(state, servers) {
       state.serversList = servers;
     },
-    UPDATE_USER_FIELD(state, { field, value }) {
-      if (state.user) {
-        state.user[field] = value;
-        localStorage.setItem("UserSetting", JSON.stringify(state.user));
-      }
-    }
+    SET_PENDING_REQUESTS(state, requests) {
+      state.pendingRequests = requests;
+      state.pendingRequestsCount = requests.length;
+    },
+    REMOVE_FRIEND(state, friendId) {
+      state.friendsList = state.friendsList.filter((friend) => friend.id !== friendId);
+    },
   },
+
   actions: {
     toogleLoading({ commit }) {
-      commit("TOOGLE_LOADING");
+      commit("TOGGLE_LOADING");
     },
-    login({ commit, dispatch }) {
-      commit("UPDATE_LOCALHOST");
+
+    async validateToken({getters}){
+      const token = getters.getToken;
+
+      try{
+        const response = await fetch("http://localhost:8080/api/auth/validade-token", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({token:token})
+        })
+        console.log(response)
+        return response
+
+      }catch(err){
+        console.log(err)
+      }
+    },
+
+    // Realiza login e configura store + WebSocket
+    async login({ commit, dispatch }) {
+      commit("SET_USER", JSON.parse(localStorage.getItem("UserSetting")) || null);
+      commit("SET_TOKEN", localStorage.getItem("token") || null);
+    
       const token = localStorage.getItem("token");
-
       if (token) {
-        dispatch("websocket/connectWebSocket", token, { root: true });
-        console.log("✅ WebSocket conectado após login.");
+        console.log(token);
+    
+        try {
+          const response = await dispatch("validateToken"); // Aguarda a resposta correta
+          const isValid = await response.json(); // Converte a resposta para JSON
+    
+          console.log("🚀 Token válido?", isValid);
+    
+          if (!isValid) {
+            console.log("🚨 Token inválido, redirecionando para login...");
+            router.push("/login");
+            return;
+          }
+    
+          dispatch("fetchFriends");
+          dispatch("fetchPendingRequests");
+          dispatch("websocket/connectWebSocket", token, { root: true });
+    
+          console.log("✅ WebSocket conectado após login.");
+        } catch (error) {
+          console.error("❌ Erro ao validar o token:", error);
+          router.push("/login");
+        }
       }
-    },
-    logout({ commit, dispatch }) {
-      // Desconecta o WebSocket ao fazer logout
-      dispatch("websocket/disconnectWebSocket", null, { root: true });
-      commit("LOGOUT");
-      console.log("🔴 WebSocket desconectado após logout.");
-    },
-    async fetchFriends({ commit, getters }) {
+    }
+    ,
+
+    // Busca solicitações pendentes de amizade
+    async fetchPendingRequests({ commit, getters }) {
+      const token = getters.getToken;
+      if (!token) {
+        console.error("⚠️ Token JWT ausente. Não foi possível buscar pendências.");
+        return [];
+      }
+
       try {
         const response = await fetch(
-          `http://localhost:8080/api/users/${getters.getUser.username}/friendships`,
+          `http://localhost:8080/api/users/${getters.getUser.username}/pending-friendships`,
           {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${getters.getToken}`
-            }
+              Authorization: `Bearer ${token}`,
+            },
           }
         );
 
         if (response.ok) {
           const data = await response.json();
-          commit(
-            "SET_FRIENDS",
-            data.map((friendship) =>
-              friendship.from.id === getters.getUser.id
-                ? friendship.to
-                : friendship.from
-            )
-          );
-        }
-      } catch (err) {
-        console.error("Erro ao buscar amigos:", err);
-      }
-    },
-    async fetchServers({ commit, getters }) {
-      try {
-        const response = await fetch(
-          `http://localhost:8080/api/users/${getters.getUser.username}/servers`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${getters.getToken}`
-            }
-          }
-        );
+          console.log("Solicitações pendentes recebidas:", data);
 
-        if (response.ok) {
-          const data = await response.json();
-          commit("SET_SERVERS", data);
+          const pendingList = data.map((friendship) => {
+            const isRequester = friendship.from.id === getters.getUser.id;
+            return {
+              id: friendship.id,
+              origin: friendship.from.id,
+              friend: isRequester ? friendship.to : friendship.from,
+            };
+          });
+
+          commit("SET_PENDING_REQUESTS", pendingList);
+          return pendingList;
+        } else {
+          console.error("Erro ao buscar pendências: Resposta não OK");
+          return [];
         }
-      } catch (err) {
-        console.error("Erro ao buscar servidores:", err);
+      } catch (error) {
+        console.error("Erro ao buscar pendências:", error);
+        return [];
       }
     },
+
     async updateUser({ commit, getters }, { field, value }) {
       try {
         const payload = {
@@ -162,10 +205,8 @@ export default createStore({
 
         if (response.ok) {
           const updatedUser = await response.json();
-          console.log(updatedUser)
           commit("SET_USER", updatedUser);
           console.log(`✅ ${field} atualizado com sucesso.`);
-
         } else {
           const errorData = await response.json();
           console.error(`Erro ao atualizar ${field}:`, errorData);
@@ -173,11 +214,148 @@ export default createStore({
       } catch (err) {
         console.error(`Erro na requisição para atualizar ${field}:`, err);
       }
-    }
+    },
+
+    async updateUserImage({commit, getters}, imagePath){
+      try{
+        console.log("to no vuex:", imagePath);
+        const payload = {
+          imageTempPath: imagePath
+        }
+
+        console.log("o pay ai", payload);
+
+        const response = await fetch(
+          `http://localhost:8080/api/users/${getters.getUser.username}/image`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${getters.getToken}`
+            },
+            body: JSON.stringify(payload)
+          }
+        );
+
+        if (response.ok) {
+          const updatedUser = await response.json();
+          commit("SET_USER", updatedUser);
+        } else {
+          const errorData = await response.json();
+
+          console.error(`Erro ao atualizar`, response);
+          console.error(`Erro ao atualizar`, errorData);
+        }
+      }catch(err){
+        console.log(err)
+      }
+    },
+
+    // Busca lista de amigos
+    async fetchFriends({ commit, getters }) {
+      try {
+        const response = await fetch(
+          `http://localhost:8080/api/users/${getters.getUser.username}/friendships`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${getters.getToken}`,
+            },
+          }
+        );
+    
+        if (response.ok) {
+          const data = await response.json();
+    
+          const friendsList = data.map((friendship) => ({
+            ...friendship.from.id === getters.getUser.id
+              ? friendship.to
+              : friendship.from,
+            friendshipId: friendship.id, // Incluindo o ID da amizade
+          }));
+    
+          console.log("Amigos recebidos com ID da amizade:", friendsList);
+          commit("SET_FRIENDS", friendsList);
+        } else {
+          console.error("Erro ao buscar amigos.");
+        }
+      } catch (error) {
+        console.error("Erro ao buscar amigos:", error);
+      }
+    },
+
+    // Busca lista de servidores
+    async fetchServers({ commit, getters }) {
+      try {
+        const token = getters.getToken;
+        if (!token) {
+          console.error("⚠️ Token JWT ausente. Não foi possível buscar servidores.");
+          return;
+        }
+
+        const response = await fetch(
+          `http://localhost:8080/api/users/${getters.getUser.username}/servers`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.ok) {
+          const servers = await response.json();
+          commit("SET_SERVERS", servers);
+        } else {
+          console.error("Erro ao buscar servidores.");
+        }
+      } catch (error) {
+        console.error("Erro ao buscar servidores:", error);
+      }
+    },
+
+    async removeFriend({ commit, getters,dispatch }, friendshipId) {
+      try {
+        const token = getters.getToken;
+        if (!token) {
+          console.error("⚠️ Token JWT ausente. Não foi possível remover amigo.");
+          return;
+        }
+
+        const response = await fetch(
+          `http://localhost:8080/api/friendships/${friendshipId}/remove`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.ok) {
+          console.log("✅ Amizade removida com sucesso no backend.");
+          dispatch("fetchFriends")
+          commit("REMOVE_FRIEND", friendshipId); 
+        } else {
+          console.error("Erro ao remover amigo no backend:", await response.text());
+        }
+      } catch (error) {
+        console.error("Erro ao remover amigo:", error);
+      }
+    },
+    getImage(imagePath){
+      console.log(imagePath)
+      return imagePath ? `http://localhost:8080/api/files/images?file-id=${imagePath}`: 'no-photo.jpg';
+    },
   },
+
   modules: {
     chat: chatModule,
     websocket,
-    rightsidebar // Registrando o módulo com o namespace correto
-  }
+    rightsidebar,
+    mobile
+  },
 });

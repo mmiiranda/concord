@@ -1,28 +1,33 @@
-// src/store/modules/websocket.js
-
 import WebSocketService from "@/services/websocketService";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 
 const state = {
   isConnected: false,
   messages: [],
   unreadChats: [],
   users: [],
+  processedEvents: new Set(),
 };
 
 const mutations = {
   SET_CONNECTED(state, status) {
     state.isConnected = status;
   },
-  SET_MESSAGES(state, messages) {
-    state.messages = messages;
+  SET_MESSAGES(state, olderMessages) {
+    state.messages.push(...olderMessages);
   },
   ADD_MESSAGE(state, message) {
-    const exists = state.messages.some(msg => msg.id === message.id);
+    const exists = state.messages.some((msg) => msg.id === message.id);
     if (!exists) {
       state.messages.unshift(message);
     } else {
-      console.log("⚠️ Mensagem duplicada ignorada:", message.id); 
+      console.log("⚠️ Mensagem duplicada ignorada:", message.id);
     }
+  },
+  RESET_MESSAGES(state) {
+    state.messages = [];
+    state.processedEvents.clear(); // se quiser limpar também o processedEvents
   },
   SET_UNREAD_CHATS(state, unreadChats) {
     state.unreadChats = unreadChats;
@@ -38,7 +43,6 @@ const actions = {
       console.log("⚠️ WebSocket já está conectado.");
       return;
     }
-
     if (!token) {
       console.error("⚠️ Token JWT ausente. WebSocket não será conectado.");
       return;
@@ -61,11 +65,24 @@ const actions = {
     });
 
     WebSocketService.onMessage((message) => {
+      // ADIÇÃO 2: Verifica se o evento (mensagem) possui um ID único
+      const eventId =
+        message?.content?.id ||
+        message?.content?.timestamp ||
+        new Date().getTime();
+
+      // Se já processamos esse ID, ignoramos
+      if (state.processedEvents.has(eventId)) {
+        console.log("⚠️ Evento duplicado ignorado:", eventId);
+        return;
+      }
+      state.processedEvents.add(eventId);
+
+      // Mensagem de chat privado
       if (message.eventType === "USER_MESSAGE") {
         const user = rootGetters["getUser"];
         const activeChat = rootGetters["chat/getActiveChat"];
-    
-        // Monta a estrutura da mensagem para exibir
+
         const newMsg = {
           id: message.content.id || message.content.timestamp,
           timestamp: message.content.timestamp || new Date().toISOString(),
@@ -73,40 +90,49 @@ const actions = {
           content: message.content.message,
         };
         commit("ADD_MESSAGE", newMsg);
-    
-        // Se a mensagem é para mim
+
+        // Se a mensagem é para o usuário atual
         if (message.content.toUserId === user.id) {
-          if (
-            !activeChat ||
-            activeChat.id !== message.content.fromUserId ||
-            activeChat.type === "server"
-          ) {
-            // Incrementa unread
+          const fromUserId = message.content.fromUserId;
+
+          if (!activeChat || activeChat.id !== fromUserId || activeChat.type === "server") {
             const existingChat = state.unreadChats.find(
-              chat => chat.fromUserId === message.content.fromUserId
+              (chat) => chat.fromUserId === fromUserId
             );
             if (existingChat) {
               existingChat.unreadMessagesCount += 1;
             } else {
               state.unreadChats.push({
-                fromUserId: message.content.fromUserId,
+                fromUserId: fromUserId,
                 latestMessageTimestamp: message.content.timestamp,
                 unreadMessagesCount: 1,
               });
             }
             commit("SET_UNREAD_CHATS", [...state.unreadChats]);
           } else {
-            // O chat está ativo, marca as mensagens como lidas
-            console.log(`✅ Marcando mensagens de ${message.content.fromUserId} como lidas.`);
-            dispatch("markMessagesAsRead", { fromUserId: message.content.fromUserId });
+            console.log(`✅ Marcando mensagens de ${fromUserId} como lidas.`);
+            dispatch("markMessagesAsRead", { fromUserId });
           }
         }
-      }else if(message.eventType === "FRIEND_REQUEST"){
-          console.log("not")
+      }
+
+      // Solicitação de amizade
+      else if (message.eventType === "FRIEND_REQUEST") {
+        console.log("📤 Nova solicitação de amizade recebida!");
+        console.log(message.content)
+        if(message.content.status == "PENDING"){
+          toast.info("Você tem uma nova solicitação de amizade!", {
+            autoClose: 3000,
+            position: "top-right",
+            theme: "dark",
+          });
+          // eslint-disable-next-line
+        }else if(message.content.status = "ACCEPTED"){
+          dispatch("fetchFriends", null, { root: true })
+        }
+        dispatch("fetchPendingRequests", null, { root: true });
       }
     });
-    
-        
   },
 
   disconnectWebSocket({ commit }) {
@@ -115,11 +141,11 @@ const actions = {
   },
 
   sendMessage(_, message) {
-    WebSocketService.sendMessage(message);  
+    WebSocketService.sendMessage(message);
     console.log("📤 Enviada (via Vuex):", message);
   },
 
-  async fetchChatMessages({ commit, state, rootGetters }, { toUserId, fromUserId, page = 0, size = 10 }) {
+  async fetchChatMessages({ commit, rootGetters }, { toUserId, fromUserId, page = 0, size = 10 }) {
     const token = rootGetters["getToken"];
     if (!token || !fromUserId) {
       console.error("Usuário não autenticado ou token ausente.");
@@ -140,9 +166,11 @@ const actions = {
       }
 
       const data = await response.json();
-      const newerMessages = data.content; 
-      commit("SET_MESSAGES", [...newerMessages, ...state.messages]); 
-      return newerMessages; 
+      const newerMessages = data.content;
+      // commit("SET_MESSAGES", [...newerMessages, ...state.messages]);
+      commit("SET_MESSAGES", newerMessages);
+      // E dentro da mutação:
+      return newerMessages;
     } catch (error) {
       console.error("Erro ao buscar mensagens:", error);
       return [];
@@ -153,7 +181,7 @@ const actions = {
     const token = rootGetters["getToken"];
     if (!token) {
       console.error("⚠️ Token JWT ausente. Não foi possível buscar chats não lidos.");
-      return;
+      return [];
     }
 
     const endpoint = `http://localhost:8080/api/messages/unread-chats`;
@@ -179,35 +207,6 @@ const actions = {
     }
   },
 
-  async fetchUsers({ commit, rootGetters }) {
-    const token = rootGetters["getToken"];
-    if (!token) {
-      console.error("⚠️ Token JWT ausente. Não foi possível buscar usuários.");
-      return;
-    }
-
-    const endpoint = `http://localhost:8080/api/users`; // Ajuste conforme sua API
-    try {
-      const response = await fetch(endpoint, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Erro ao buscar usuários.");
-      }
-
-      const data = await response.json();
-      commit("SET_USERS", data);
-      return data;
-    } catch (error) {
-      console.error("Erro ao buscar usuários:", error);
-      return [];
-    }
-  },
-
   async markMessagesAsRead({ commit, state, rootGetters }, { fromUserId }) {
     const token = rootGetters["getToken"];
     if (!token) {
@@ -215,15 +214,15 @@ const actions = {
       return;
     }
 
-    const endpoint = `http://localhost:8080/api/messages/read`; // Atualizado para o novo endpoint
+    const endpoint = `http://localhost:8080/api/messages/read`;
     try {
       const response = await fetch(endpoint, {
-        method: "PATCH", // Alterado para PATCH
+        method: "PATCH",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ fromUserId }), // Certifique-se de que o payload corresponde ao backend
+        body: JSON.stringify({ fromUserId }),
       });
 
       if (!response.ok) {
@@ -232,8 +231,8 @@ const actions = {
 
       console.log(`✅ Mensagens de ${fromUserId} marcadas como lidas.`);
 
-      // Atualiza o estado no Vuex
-      const existingChat = state.unreadChats.find(chat => chat.fromUserId === fromUserId);
+      // Zera o contador de unreadChats no state
+      const existingChat = state.unreadChats.find((chat) => chat.fromUserId === fromUserId);
       if (existingChat) {
         existingChat.unreadMessagesCount = 0;
         commit("SET_UNREAD_CHATS", [...state.unreadChats]);
@@ -249,7 +248,7 @@ const getters = {
   messages: (state) => state.messages,
   unreadChats: (state) => state.unreadChats,
   users: (state) => state.users,
-  activeChat: (_, __, rootState) => rootState.chat.activeChat, // Retorna o chat ativo
+  activeChat: (_, __, rootState) => rootState.chat.activeChat,
 };
 
 export default {

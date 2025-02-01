@@ -1,10 +1,8 @@
-<!-- src/components/Sidebar.vue -->
-
 <template>
-  <div class="flex h-[90vh] bg-[#272727]">
+  <div class="flex h-[90vh] bg-[#272727] fixed z-50 md:relative  md:flex">
     <div class="flex flex-col items-center py-6">
       <div class="flex flex-col items-center gap-1">
-        <!-- Ícone de "home" que reseta para a tela principal -->
+
 
         <div class="relative flex items-center">
             <MiniServerIcon
@@ -12,13 +10,10 @@
             imagePath="logo_icon.svg"
             @click="returnMainPage"
           />
-          <span class="absolute top-0 right-0 font-bold bg-red text-white rounded-full px-2 py-0.5 text-xs">
-            2
-          </span>
         </div>
         
         <div>
-          <!-- Lista de amigos com mensagens pendentes -->
+          
           <div 
             v-for="friend in friendsWithPendingMessages" 
             :key="friend.id" 
@@ -60,9 +55,15 @@
     <transition name="slide">
       <div 
         v-if="isOpen" 
-        class="bg-[#363636] flex flex-col ml-2 text-white min-w-48"
+        class="bg-[#363636] flex flex-col ml-2 text-white min-w-48 relative"
       >
         <div>
+          <div 
+            class="absolute right-3 top-3 cursor-pointer block md:hidden"
+            @click="closeSidebar"
+          >
+            X
+          </div>
           <HomeSideBarContent />
         </div>
       </div>
@@ -113,6 +114,8 @@ export default {
     ...mapActions("websocket", ["fetchUnreadChats", "fetchUsers", "markMessagesAsRead"]),
     ...mapActions("chat", ["setActiveChat"]),
     ...mapActions(["fetchServers"]),
+    ...mapActions("mobile", ["closeSidebar"]),
+
 
     // Função para obter a imagem do amigo
     getImage(friend) {
@@ -150,13 +153,15 @@ export default {
       await this.markMessagesAsRead({ fromUserId: friend.id });
       console.log(`✅ Mensagens de ${friend.id} marcadas como lidas.`);
 
-      // 3) (Opcional) Emitir para o pai, se ainda precisar
+      // 3) (Opcional) Emitir para o pai, se lineainda precisar
+      this.closeSidebar()
       this.$emit("openChat", friend.id);
     },
 
     
     returnMainPage() {
       console.log("🔄 Retornando para a página principal");
+      this.closeSidebar()
       this.setActiveChat(null);
     },
     
@@ -168,6 +173,8 @@ export default {
         name: server.name,
         type: "server"
       });
+
+      this.closeSidebar()
     },
     
     toggleModalCreateServer() {
@@ -179,8 +186,7 @@ export default {
     const token = this.$store.getters["getToken"];
     if (token) {
       this.$store.dispatch("websocket/connectWebSocket", token);
-      this.$store.dispatch("websocket/fetchUnreadChats");
-      this.$store.dispatch("websocket/fetchUsers");
+      this.$store.dispatch("websocket/fetchUnreadChats");   
       this.$store.dispatch("fetchServers"); // Chama fetchServers do módulo raiz
     } else {
       console.error("⚠️ Token JWT não encontrado. Não foi possível conectar ao WebSocket.");

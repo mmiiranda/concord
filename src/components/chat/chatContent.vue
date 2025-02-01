@@ -1,20 +1,27 @@
 <template>
   <div class="h-full w-full flex flex-col gap-4 px-10 py-6">
-    <h2 class="font-bold text-lg">{{ chatTitle }}</h2>
+    <h2 class="font-bold text-lg text-center md:text-left">{{ chatTitle }}</h2>
 
-    <div class="h-full overflow-y-auto flex flex-col-reverse gap-2 border-t-2 border-darkblue">
-      <div v-for="message in messages" :key="message.id || message.timestamp" class="message">
-        <MessageChat
+    <div 
+      ref="messageContainer"
+      class="h-full overflow-y-auto flex flex-col-reverse gap-2 border-t-2 border-darkblue"
+      @scroll.passive="handleScroll"
+    >
+      <div 
+        v-for="message in messages" 
+        :key="message.id || message.timestamp" 
+        class="message"
+      >
+          <MessageChat
           :name="OwnerMessage(message.fromUserId)"
-          :date="formatDate(message.timestamp)"
-          :hour="formatHour(message.timestamp)"
+          :msgTimestamp="message.timestamp"
           :src="message.senderAvatar || 'no-photo.jpg'"
           :message="message.content"
-        />
+      />
       </div>
     </div>
 
-    <div class="relative" >
+    <div class="relative">
       <ChatInput @sendMessage="sendMessageHandler" />
     </div>
   </div>
@@ -37,6 +44,15 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      page: 0,
+      size: 20,
+      hasMoreMessages: true,
+      isLoadingOlder: false, // Flag para evitar múltiplos loads ao mesmo tempo
+      container: this.$refs.messageContainer
+    };
+  },
   computed: {
     ...mapGetters(["getToken", "getUser"]),
     ...mapGetters("websocket", ["messages", "isConnected"]),
@@ -52,17 +68,14 @@ export default {
     sendMessageHandler(messageContent) {
       const user = this.getUser;
       const token = this.getToken;
-
       if (!token || !user || !user.id) {
         console.error("Usuário não autenticado ou token ausente.");
         return;
       }
-
       if (!this.isConnected) {
         console.error("WebSocket não está conectado.");
         return;
       }
-
       const messagePayload = {
         eventType: "USER_MESSAGE",
         content: {
@@ -70,66 +83,108 @@ export default {
           toUserId: this.chatData.id,
         },
       };
-
       console.log("📝 Enviando payload da mensagem:", messagePayload);
       this.sendMessage(messagePayload);
-      this.message = '';
-    },
 
-    formatDate(timestamp) {
-      if (!timestamp) return '';
-      const date = new Date(timestamp);
-      return date.toLocaleDateString(undefined, {
-        year: 'numeric',
-        month: 'numeric',
-        day: 'numeric',
+      this.$nextTick(() => {
+        this.container = 0
       });
+
     },
 
-    formatHour(timestamp) {
-      if (!timestamp) return '';
-      const date = new Date(timestamp);
-      return date.toLocaleTimeString(undefined, {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-      });
+    OwnerMessage(id) {
+      return id == this.getUser.id ? this.getUser.username : this.chatData.name;
     },
 
-    OwnerMessage(id){
-      return id == this.getUser.id ? this.getUser.username : this.chatData.name
-    }
+     handleScroll() {
+      const container = this.$refs.messageContainer;
+      console.log(container.scrollTop)
+      if (this.isLoadingOlder || !this.hasMoreMessages) return;
+
+
+     
+      if (!container) return;
+
+
+      const offset = -799; 
+      console.log(container.scrollTop)
+      if (container.scrollTop <= offset * (this.page * 2)) {
+        console.log(container.scrollTop)
+        console.log("🔄 Scroll atingiu topo, carregando mais mensagens...");
+        this.loadOlderMessages();
+      }
+    },
+
+
+    async loadOlderMessages() {
+      this.isLoadingOlder = true;
+
+      this.page += 1;
+      console.log(`🔎 Buscando página ${this.page} de mensagens antigas...`);
+
+      try {
+        const olderMessages = await this.fetchChatMessages({
+          toUserId: this.chatData.id,
+          fromUserId: this.getUser.id,
+          page: this.page,
+          size: this.size,
+        });
+
+        if (!olderMessages || olderMessages.length < this.size) {
+          this.hasMoreMessages = false;
+          console.log("🚫 Não há mais mensagens a carregar.");
+        }
+
+        this.$nextTick(() => {
+          this.isLoadingOlder = false;
+        });
+      } catch (error) {
+        console.error("❌ Erro ao carregar mensagens antigas:", error);
+        this.isLoadingOlder = false;
+      }
+  }
+
   },
 
   watch: {
-    chatData: {
-      immediate: true,
-      handler() {
-        this.$store.commit("websocket/SET_MESSAGES", []); // Zera as mensagens no Vuex
-        this.fetchChatMessages({
-          toUserId: this.chatData.id,
-          fromUserId: this.getUser.id,
-          page: 0,
-          size: 20,
-        });
-      },
+  chatData: {
+    immediate: true,
+    handler() {
+      // Zera mensagens e reinicia paginação
+      this.$store.commit("websocket/SET_MESSAGES", []);
+      this.page = 0;
+      this.hasMoreMessages = true;
+      this.isLoadingOlder = false;
+
+      // Carrega a primeira página
+      this.fetchChatMessages({
+        toUserId: this.chatData.id,
+        fromUserId: this.getUser.id,
+        page: this.page,
+        size: this.size,
+      }).then((msgs) => {
+        if (!msgs || msgs.length < this.size) {
+          this.hasMoreMessages = false;
+        }
+      });
     },
   },
+},
+
 };
 </script>
 
 <style scoped>
-.status {
-  font-size: 0.8rem;
-  color: gray;
-  margin-left: 8px;
+.load-more {
+  text-align: center;
+  padding: 0.5rem;
 }
 .load-more button {
   background-color: #5865f2;
   color: white;
-  border: none;
-  padding: 10px 20px;
+  padding: 8px 14px;
   border-radius: 5px;
+  border: none;
   cursor: pointer;
 }
 .load-more button:hover {

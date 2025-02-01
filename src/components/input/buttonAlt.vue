@@ -1,7 +1,7 @@
 <template>
         <input :type="type" 
         :value="value"
-        class="bg-white hover:bg-zinc-400 transition-all w-full p-2 text-black font-bold outline-none rounded shadow" />
+        class="bg-purple-600 hover:bg-zinc-400 transition-all w-full p-2 text-white font-bold outline-none rounded shadow" />
 </template>
 
 <script>

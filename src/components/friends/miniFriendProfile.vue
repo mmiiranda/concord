@@ -1,13 +1,13 @@
 <template>
     <div :class="['flex items-center gap-3   cursor-pointer  transition-all ease-in'
         , newMessage ? 'opacity-100' : 'opacity-80']">
-        <div class="w-5 h-5 rounded-full
+        <div class="w-7 h-7 rounded-full
         grid place-items-center overflow-hidden bg-darkblue">
             <img 
             class="w-full h-full object-cover"
-            :src="src">
+            :src="getImage(src)">
         </div>
-        <h5 class="text-sm"> {{ name }} </h5>
+        <h5 class="text-md"> {{ name }} </h5>
     </div>
 </template>
 
@@ -27,6 +27,12 @@
                 type: Boolean,
                 required: true
             }
+        },
+        methods: {
+            getImage(imagePath){
+                console.log(imagePath)
+                return imagePath ? `http://localhost:8080/api/files/images?file-id=${imagePath}`: 'no-photo.jpg';
+            },
         }
     }
 </script>

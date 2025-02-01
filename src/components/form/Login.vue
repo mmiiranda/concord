@@ -2,7 +2,7 @@
     <div class="flex flex-col text-white gap-12 w-full">
         <div class="grid place-items-center">
             <img src="logo.svg" alt="Concord Logo">
-            <h1 class="font-bold text-3xl text-center">Bem Vindo ao Concord</h1>
+            <h1 class="font-bold text-3xl text-center">Bem Vindo ao <span class="text-purple-600">Concord</span></h1>
         </div>
         <form @submit.prevent="handleSubmit" novalidate>
             <div class="flex flex-col gap-2">

@@ -11,14 +11,14 @@
       >
       <label 
          :for="name" 
-         class="border-dashed border-white border-2 grid place-content-center rounded-full w-24 h-24 shadow-lg cursor-pointer my-2"
+         class="border-dashed overflow-hidden border-white border-2 grid place-content-center rounded-full w-24 h-24 shadow-lg cursor-pointer my-2"
          @mouseover="showIcon = true"
          @mouseleave="showIcon = false"
       >
          <img 
-            :src="showIcon ? defaultIcon : (placeholderImage ||previewImage)" 
+            :src="showIcon ? defaultIcon : (placeholderImage||previewImage)" 
             alt="Selected Image" 
-            class="w-full h-full object-cover rounded-full"
+            class="w-full h-full object-cover"
          >
       </label>
    </div>
@@ -48,51 +48,25 @@ export default {
       return {
          previewImage: defaultIcon,
          defaultIcon,
-         showIcon: false, // Controla a exibição do ícone ao passar o mouse
+         showIcon: false, 
       };
    },
    methods: {
       async onFileChange(event) {
          const file = event.target.files[0];
+
          if (file) {
+            console.log("📂 Arquivo selecionado:", file);
+
+            // Criando um preview da imagem
             const reader = new FileReader();
             reader.onload = (e) => {
-               this.previewImage = e.target.result;
+                  this.previewImage = e.target.result; // Define a pré-visualização da imagem
+                  this.$emit("imageUploaded", file);  // Emite o evento para o componente pai com o arquivo
             };
             reader.readAsDataURL(file);
-            
-            await this.uploadFile(file);
          }
       },
-      
-      async uploadFile(file) {
-         const formData = new FormData();
-         formData.append("image", file);
-
-         const token = localStorage.getItem("token");
-
-         try {
-            const response = await fetch("http://localhost:8080/api/files/images", {
-               method: "POST",
-               body: formData,
-               headers: {
-                  "Authorization": `Bearer ${token}`
-               }
-            });
-
-            if (!response.ok) {
-               throw new Error("Erro ao fazer upload da imagem");
-            }
-
-            const data = await response.json();
-            console.log("File ID:", data.fileId);
-
-            this.$emit("imageUploaded", data.fileId);
-
-         } catch (error) {
-            console.error("Erro no upload:", error);
-         }
-      }
    }
 };
 </script>

@@ -23,7 +23,7 @@
 
 <script>
 import IconButton from './iconButton.vue';
-import editIcon from '@/components/icon/edit.svg'
+import editIcon from '@/components/icon/edit_white.svg'
 
 export default {
     name: "updateSetting",

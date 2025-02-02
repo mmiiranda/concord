@@ -103,6 +103,8 @@ export default createStore({
     async validateToken({getters, state}){
       const token = getters.getToken;
 
+      if(!token) return false
+
       try{
         const response = await fetch(`${state.apiUrl}/api/auth/validade-token`, {
           method: "POST",
@@ -206,7 +208,7 @@ export default createStore({
         const payload = {
           [field]: value
         };
-        
+
         const response = await fetch(
           `${state.apiUrl}/api/users/${getters.getUser.username}/${field}`,
           {

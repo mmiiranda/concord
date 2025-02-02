@@ -8,6 +8,7 @@ const state = {
   unreadChats: [],
   users: [],
   processedEvents: new Set(),
+  apiUrl: process.env.VUE_APP_API_URL,
 };
 
 const mutations = {
@@ -145,14 +146,14 @@ const actions = {
     console.log("📤 Enviada (via Vuex):", message);
   },
 
-  async fetchChatMessages({ commit, rootGetters }, { toUserId, fromUserId, page = 0, size = 10 }) {
+  async fetchChatMessages({ commit, rootGetters, state }, { toUserId, fromUserId, page = 0, size = 10 }) {
     const token = rootGetters["getToken"];
     if (!token || !fromUserId) {
       console.error("Usuário não autenticado ou token ausente.");
       return [];
     }
 
-    const endpoint = `http://localhost:8080/api/messages/chat?toUserId=${toUserId}&fromUserId=${fromUserId}&page=${page}&size=${size}&sort=timestamp,desc`;
+    const endpoint = `${state.apiUrl}/api/messages/chat?toUserId=${toUserId}&fromUserId=${fromUserId}&page=${page}&size=${size}&sort=timestamp,desc`;
     try {
       const response = await fetch(endpoint, {
         headers: {
@@ -177,14 +178,14 @@ const actions = {
     }
   },
 
-  async fetchUnreadChats({ commit, rootGetters }) {
+  async fetchUnreadChats({ commit, rootGetters, state }) {
     const token = rootGetters["getToken"];
     if (!token) {
       console.error("⚠️ Token JWT ausente. Não foi possível buscar chats não lidos.");
       return [];
     }
 
-    const endpoint = `http://localhost:8080/api/messages/unread-chats`;
+    const endpoint = `${state.apiUrl}/api/messages/unread-chats`;
     try {
       const response = await fetch(endpoint, {
         headers: {
@@ -214,7 +215,7 @@ const actions = {
       return;
     }
 
-    const endpoint = `http://localhost:8080/api/messages/read`;
+    const endpoint = `${state.apiUrl}/api/messages/read`;
     try {
       const response = await fetch(endpoint, {
         method: "PATCH",

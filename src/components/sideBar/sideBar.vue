@@ -1,7 +1,7 @@
 <template>
   <div class="flex h-[90vh] bg-[#272727] fixed z-50 md:relative  md:flex">
-    <div class="flex flex-col items-center py-6">
-      <div class="flex flex-col items-center gap-1">
+    <div class="flex flex-col items-center py-6 px-1">
+      <div class="flex flex-col items-center  gap-1">
 
 
         <div class="relative flex items-center">
@@ -56,7 +56,7 @@
     <transition name="slide">
       <div 
         v-if="isOpen" 
-        class="bg-[#363636] flex flex-col ml-2 text-white min-w-48 relative"
+        class="bg-[#363636] flex flex-col  text-white min-w-48 relative"
       >
         <div>
           <div 

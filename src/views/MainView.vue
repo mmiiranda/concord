@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-cleangray h-[90dvh] flex overflow-hidden relative" ref="screen">
+  <div v-if="isLoggedIn" class="bg-cleangray h-[90dvh] flex overflow-hidden relative" ref="screen">
     <div v-if="isSidebarOpen" class="relative">
       <sideBar />
     </div>
@@ -36,7 +36,7 @@ export default {
   data() {
     return {
       screenWidth: window.innerWidth,
-
+      isLoggedIn: false,
       icon: {
         MenuIcon
       }
@@ -63,16 +63,15 @@ export default {
   methods: {
     ...mapActions("chat", ["setActiveChat"]),
     ...mapActions("mobile", ["detectMobile", "closeSidebar", "openSidebar"]),
-    ...mapActions(["fetchServers", "login"]),
+    ...mapActions(["login"]),
     handleResize() {
       this.screenWidth = window.innerWidth;
       this.detectMobile();
     },
   },
-  created() {
+  async created() {
+    this.isLoggedIn = await this.login();
     this.setActiveChat(null);
-    this.login();
-    this.fetchServers();
   },
   mounted() {
     this.detectMobile(); 

@@ -123,34 +123,38 @@ export default createStore({
 
     // Realiza login e configura store + WebSocket
     async login({ commit, dispatch }) {
-      commit("SET_USER", JSON.parse(localStorage.getItem("UserSetting")) || null);
-      commit("SET_TOKEN", localStorage.getItem("token") || null);
-    
+      console.log("chamou a funco login");
+      console.log("token:"+localStorage.getItem("token"));
+      console.log(typeof localStorage.getItem("token"));
       const token = localStorage.getItem("token");
+      
       if (token) {
-        console.log(token);
+        commit("SET_USER", JSON.parse(localStorage.getItem("UserSetting")));
+        commit("SET_TOKEN", localStorage.getItem("token"));
     
         try {
           const response = await dispatch("validateToken"); // Aguarda a resposta correta
           const isValid = await response.json(); // Converte a resposta para JSON
     
-          console.log("🚀 Token válido?", isValid);
-    
           if (!isValid) {
-            console.log("🚨 Token inválido, redirecionando para login...");
             router.push("/login");
-            return;
+            return false;
           }
     
           dispatch("fetchFriends");
+          dispatch("fetchServers")
           dispatch("fetchPendingRequests");
           dispatch("websocket/connectWebSocket", token, { root: true });
+          return true;
     
-          console.log("✅ WebSocket conectado após login.");
         } catch (error) {
-          console.error("❌ Erro ao validar o token:", error);
           router.push("/login");
+          return false;
         }
+      }else{
+        console.log("nao tem token");
+        router.push("/login");
+        return false;
       }
     },
 
@@ -162,7 +166,6 @@ export default createStore({
     async fetchPendingRequests({ commit, getters, state }) {
       const token = getters.getToken;
       if (!token) {
-        console.error("⚠️ Token JWT ausente. Não foi possível buscar pendências.");
         return [];
       }
 

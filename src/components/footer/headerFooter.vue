@@ -1,5 +1,5 @@
 <template>
-    <div class="h-[10dvh] bg-darkblue w-full flex justify-between items-center px-8">
+    <div class="h-[10dvh] min-h-[auto] bg-darkblue w-full flex justify-between items-center px-8">
         <div class="flex gap-4">
             <userProfile />
         </div>

@@ -3,7 +3,7 @@
         :id="name" 
         :name="name" 
         :type="type" 
-        class="text-white hover:bg-zinc-400 px-1 py-1 h-10 w-11 transition-all font-bold outline-none rounded-lg shadow"
+        class="text-white grid place-items-center hover:bg-zinc-400 px-1 py-1 h-10 w-11 transition-all font-bold outline-none rounded-lg shadow"
     >
         <img 
             :src="src"  

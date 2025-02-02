@@ -4,7 +4,7 @@
             <div class="absolute right-6 top-4">
                 <a href="#" @click="closeEmit">X</a>
             </div>
-            <div>
+            <div class="hidden md:block">
                 <img src="../../assets/forgetPasswordIcon.svg" alt="">
             </div>
             <div class="flex flex-col justify-between">
@@ -81,7 +81,7 @@ export default {
 
             this.$toast("Verificando Email", "loading")
             try {
-                const response = await fetch("http://localhost:8080/api/auth/forgot-password", {
+                const response = await fetch(`${process.env.VUE_APP_API_URL}/api/auth/forgot-password`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"

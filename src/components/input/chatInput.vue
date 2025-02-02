@@ -19,7 +19,7 @@
                 <button 
                     class="grid place-items-center hover:bg-slate-100/20 rounded-full 
                     transition-all ease-in duration-100 hover:scale-105"    
-                    @click.stop="openFileUpdatePopup"
+                    @click.stop="missing"
                 >
                     <img src="../icon/plus.svg" alt="Ícone de Mais">
                 </button>
@@ -38,7 +38,7 @@
             <button 
                 class="grid place-items-center hover:bg-slate-100/20 rounded-full 
                 transition-all ease-in duration-100 hover:scale-105"
-                @click.stop="() => {recordAudio(); openAudioRecoderContent()}"
+                @click.stop="missing"
             >
                 <img src="../icon/audio.svg" alt="Ícone de Áudio">
             </button>
@@ -50,6 +50,7 @@
 import PopupComp from '../popup/popup.vue';
 import MideaRecorder from '../form/MideaRecorder.vue';
 import PopupFormFile from '../form/popupFormFile.vue';
+import { mapActions } from 'vuex';
 
 export default {
     name: "chatInput",
@@ -66,6 +67,7 @@ export default {
         PopupFormFile
     },
     methods: {
+        ...mapActions(["missing"]),
         adjustHeight() {
             this.$nextTick(() => {
                 const textarea = this.$refs.messageInput;

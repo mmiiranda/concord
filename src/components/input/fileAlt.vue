@@ -11,21 +11,21 @@
       >
       <label 
          :for="name" 
-         class="border-dashed overflow-hidden border-white border-2 grid place-content-center rounded-full w-24 h-24 shadow-lg cursor-pointer my-2"
+         class="border-dashed overflow-hidden border-white border-2 flex items-center   rounded-full w-24 h-24 shadow-lg cursor-pointer my-2"
          @mouseover="showIcon = true"
          @mouseleave="showIcon = false"
       >
          <img 
             :src="showIcon ? defaultIcon : (placeholderImage||previewImage)" 
             alt="Selected Image" 
-            class="w-full h-full object-cover"
+            class="size-full object-cover"
          >
       </label>
    </div>
 </template>
 
 <script>
-import defaultIcon from '../icon/downloadIcon.svg'; 
+import defaultIcon from '../icon/tst.png'; 
 
 export default {
    name: "fileAlt",

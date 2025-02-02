@@ -107,7 +107,7 @@ export default {
             const token = localStorage.getItem("token");
 
             try {
-                const response = await fetch("http://localhost:8080/api/files/images", {
+                const response = await fetch(`${process.env.VUE_APP_API_URL}/api/files/images`, {
                     method: "POST",
                     body: formData,
                     headers: {

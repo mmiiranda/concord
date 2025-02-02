@@ -5,8 +5,9 @@
         </div>
         <div>
             <div class="flex ">
-                <toogleIconButton :src="icons.micIcon"/>
-                <toogleIconButton :src="icons.headphoneIcon"/>
+                <toogleIconButton       
+                @click="exit"
+                :src="icons.logoutIcon"/>
                 <toogleIconButton       
                 @click="emitToogleConfig"
                 :src="icons.configIcon"/>
@@ -21,8 +22,8 @@ import userProfile from "../user/userProfile.vue"
 import micIcon from "../icon/mic.svg"
 import headphoneIcon from "../icon/headphone.svg"
 import configIcon from "../icon/config.svg"
-import { mapGetters } from 'vuex';
-
+import logoutIcon from "../icon/logoutIcon.svg"
+import { mapActions, mapGetters } from 'vuex';
 
     export default {
         name: "headerFooter",
@@ -31,7 +32,8 @@ import { mapGetters } from 'vuex';
             icons: {
                 micIcon,
                 headphoneIcon,
-                configIcon
+                configIcon,
+                logoutIcon
             }
         };
         },
@@ -39,9 +41,14 @@ import { mapGetters } from 'vuex';
             ...mapGetters(["getToken", "getUser"]),
         },
         methods: {
+            ...mapActions(["logout"]),
             emitToogleConfig(){
                 this.$emit("toogleConfig")
             },
+            exit(){
+                this.$router.push("/login");
+                setTimeout(()=>{this.logout()}, 200 )
+            }
         },  
         components: {
             toogleIconButton,

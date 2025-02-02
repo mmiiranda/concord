@@ -1,9 +1,9 @@
 <template>
     <div class="text-white flex flex-col w-full">
-        <div class="flex justify-center md:justify-start border-2 border-darkblue/80 w-full px-2 lg:px-8 py-2">
-            <div class="flex gap-2 border-r-2 border-gray pr-4">
-                <img src="../icon/people.svg" alt="Icone de Pessoas">
-                <h4 class="font-bold">Friends</h4>
+        <div class="flex justify-center md:justify-start border-2 border-darkblue/80 w-full px-1 lg:px-8 py-2">
+            <div class="flex gap-2 md:border-r-2 md:border-gray md:pr-4">
+                <img src="../icon/people.svg" class="hidden md:block" alt="Icone de Pessoas">
+                <h4 class="font-bold hidden md:block">Friends</h4>
             </div>
             <div class="flex ml-2 lg:ml-4 gap-3 lg:gap-5">
                 <div>
@@ -58,7 +58,7 @@
                 <h3 class="font-bold text-sm mt-5">FRIENDS - {{ filteredAllFriends.length }}</h3>
                 <div class="flex flex-col w-full mt-4">
                     <FriendsForChat
-                        v-for="friend in friendsList"
+                        v-for="friend in filteredAllFriends"
                         :key="friend.id"
                         :name="friend.name"
                         :username="friend.username"
@@ -181,7 +181,7 @@ export default {
             };
 
             try {
-                const response = await fetch("http://localhost:8080/api/friendships", {
+                const response = await fetch(`${process.env.VUE_APP_API_URL}/api/friendships`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

@@ -60,11 +60,11 @@ export default {
       console.log("Tentando remover amizade com ID:", friendshipId);
       try {
         await this.removeFriend(friendshipId);
-        this.$toast("Amigo removido com sucesso!", "success");
+        this.$toast("Friend removed successfully!", "success");
         
         this.closeSidebar();
       } catch (error) {
-        this.$toast("Erro ao remover amigo. Tente novamente.", "error");
+        this.$toast("Error removing friend. Please try again.", "error");
         console.error("Erro ao remover amigo:", error);
       }
     },
@@ -75,7 +75,7 @@ export default {
     },
     getImage(imagePath){
         console.log(imagePath)
-        return imagePath ? `http://localhost:8080/api/files/images?file-id=${imagePath}`: 'no-photo.jpg';
+        return imagePath ? `${process.env.VUE_APP_API_URL}/api/files/images?file-id=${imagePath}`: 'no-photo.jpg';
       },
   },
   components: {

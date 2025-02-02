@@ -3,8 +3,7 @@
     hover:bg-gray/20 px-2 transition-all ease-in">
       <div class="flex items-center gap-2 cursor-pointer">
         <div class="bg-darkblue flex h-9 w-9 relative rounded-full justify-center items-center">
-          <span> {{ name[0].toUpperCase() }} </span>
-          <img :src="src" class="w-full h-full" v-if="src" alt="Avatar">
+          <img :src="getImage(src)" class="w-full h-full rounded-full" alt="Avatar">
           <div :class="['w-3 h-3 absolute bottom-0 right-0 rounded-full',
             isOnline ? 'bg-[#00C417]' : 'bg-red']"></div>
         </div>
@@ -59,12 +58,20 @@
     methods: {
       ...mapActions("chat", ["setActiveChat"]), 
       ...mapActions('rightsidebar', ['openSidebarWithFriend']),
-      openChat(friend) {
+      ...mapActions("websocket",["markMessagesAsRead"]),
+      getImage(imagePath){
+          return imagePath ? `${process.env.VUE_APP_API_URL}/api/files/images?file-id=${imagePath}`: 'no-photo.jpg';
+      },
+      async openChat(friend) {
         this.setActiveChat({
           id: friend.id,
           name: friend.username, // Pode ajustar para 'friend.name' se preferir
-          type: "dm" 
+          type: "dm" ,
+          imagePath: friend.imagePath
         });
+
+        await this.markMessagesAsRead({ fromUserId: friend.id });
+        console.log(`✅ Mensagens de ${friend.id} marcadas como lidas.`);
       },
       selectFriend() {
         console.log(this.obj)

@@ -24,6 +24,7 @@
                 :name="friend.username"
                 :imagePath="getImage(friend)"
                 @click="openChat(friend)"
+                class="opacity-80 hover:opacity-100"
               />
               <!-- Badge de mensagens não lidas -->
               <span class="absolute top-0 right-0 font-bold bg-red text-white rounded-full px-2 py-0.5 text-xs">
@@ -46,7 +47,7 @@
           />
 
           <!-- Ícone que abre o modal de criar servidor -->
-          <CreateServerIcon @click="toggleModalCreateServer" />
+          <CreateServerIcon @click="missing" />
         </div>
       </div>
     </div>
@@ -115,19 +116,19 @@ export default {
     ...mapActions("chat", ["setActiveChat"]),
     ...mapActions(["fetchServers"]),
     ...mapActions("mobile", ["closeSidebar"]),
-
+    ...mapActions(["missing"]),
 
     // Função para obter a imagem do amigo
     getImage(friend) {
-      return friend.avatarPath 
-        ? `http://localhost:8080/api/files/images?file-id=${friend.avatarPath}` 
+      return friend.imagePath 
+        ? `${process.env.VUE_APP_API_URL}/api/files/images?file-id=${friend.imagePath}` 
         : "no-photo.jpg";
     },
 
     // Função para obter a imagem do servidor
     getServerImage(server){
       return server.imagePath 
-        ? `http://localhost:8080/api/files/images?file-id=${server.imagePath}` 
+        ? `${process.env.VUE_APP_API_URL}/api/files/images?file-id=${server.imagePath}` 
         : null // Use uma imagem padrão
     },
     
@@ -146,7 +147,8 @@ export default {
       this.setActiveChat({
         id: friend.id,
         name: friend.username,
-        type: "dm" // ou "user", dependendo de como você diferencia DM
+        type: "dm",
+        imagePath: friend.imagePath
       });
 
       // 2) Chama a action para marcar como lidas

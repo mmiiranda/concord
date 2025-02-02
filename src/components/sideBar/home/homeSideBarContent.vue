@@ -54,18 +54,24 @@ export default {
   methods: {
     ...mapActions("chat", ["setActiveChat"]),
     ...mapActions("mobile", ["closeSidebar"]),
+    ...mapActions("websocket",["markMessagesAsRead"]),
 
     channelsFromServer(serverId) {
       const server = this.getServers.find((sv) => sv.id === serverId);
       return server && server.channels ? server.channels : [];
     },
 
-    openDm(friend) {
+    async openDm(friend) {
       this.setActiveChat({
         id: friend.id,
         name: friend.username,
-        type: "dm" 
+        type: "dm" ,
+        imagePath: friend.imagePath
       });
+
+      await this.markMessagesAsRead({ fromUserId: friend.id });
+      console.log(`✅ Mensagens de ${friend.id} marcadas como lidas.`);
+
       this.closeSidebar()
     },
 
@@ -80,7 +86,7 @@ export default {
     
     getImage(imagePath){
       console.log(imagePath)
-      return imagePath ? `http://localhost:8080/api/files/images?file-id=${imagePath}`: "no-photo.jpg";
+      return imagePath ? `${process.env.VUE_APP_API_URL}/api/files/images?file-id=${imagePath}`: "no-photo.jpg";
     }
   }
 };

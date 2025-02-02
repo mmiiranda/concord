@@ -4,9 +4,9 @@
       <sideBar />
     </div>
     <div class="absolute" v-else>
-      <ButtonAlt 
+      <IconButton 
         type="button"
-        value="Open"
+        :src="icon.MenuIcon"
         @click="openSidebar"
       />
     </div>
@@ -14,9 +14,9 @@
       <MainContent v-if="!activeChat" />
       <ChatContent v-else :chatData="activeChat" />
       <RightSideBar />
-      <WsTst />
     </div>
     <footerConfig class="z-50" />
+    <FirstAcessModal v-show="getFirstAcess"/>
   </div>
 </template>
 
@@ -26,15 +26,20 @@ import MainContent from "@/components/main/MainContent.vue";
 import footerConfig from "@/components/footer/footerConfig.vue";
 import ChatContent from "@/components/chat/chatContent.vue";
 import { mapActions, mapGetters } from "vuex";
-import WsTst from "@/components/wsTest/wsTst.vue";
 import RightSideBar from "@/components/sideBar/rightSideBar.vue";
-import ButtonAlt from "@/components/input/buttonAlt.vue";
+import MenuIcon from "@/components/icon/menuBugger.svg"
+import FirstAcessModal from "@/components/form/firstAcessModal.vue";
+import IconButton from "@/components/input/iconButton.vue";
 
 export default {
   name: "MainView",
   data() {
     return {
       screenWidth: window.innerWidth,
+
+      icon: {
+        MenuIcon
+      }
     };
   },
   components: { 
@@ -43,15 +48,17 @@ export default {
     ChatContent,
     MainContent,
     RightSideBar,
-    ButtonAlt,
-    WsTst,
+    FirstAcessModal,
+    IconButton
   },
   computed: {
     ...mapGetters("chat", ["getActiveChat"]),
     activeChat() {
+      console.log("dskldsldksldksldksl", this.getActiveChat)
       return this.getActiveChat;
     },
     ...mapGetters("mobile", ["isSidebarOpen", "isMobile"]),
+    ...mapGetters(["getFirstAcess"])
   },
   methods: {
     ...mapActions("chat", ["setActiveChat"]),
@@ -70,6 +77,7 @@ export default {
   mounted() {
     this.detectMobile(); 
     window.addEventListener("resize", this.handleResize);
+    console.log("primeiro acesso?",this.getFirstAcess)
   },
   beforeUnmount() {
     window.removeEventListener("resize", this.handleResize);

@@ -5,6 +5,9 @@ import rightsidebar from "./rightsidebar";
 import mobile from "./mobile"
 import router from "@/router";
 
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
+
 export default createStore({
   state: {
     loading: false,
@@ -14,6 +17,8 @@ export default createStore({
     serversList: [],
     pendingRequestsCount: 0,
     pendingRequests: [],
+    firstAcess: false,
+    apiUrl: process.env.VUE_APP_API_URL,
   },
 
   getters: {
@@ -23,6 +28,7 @@ export default createStore({
     getFriends: (state) => state.friendsList,
     getServers: (state) => state.serversList,
     isLoggedIn: (state) => !!state.token,
+    getFirstAcess: (state) => state.firstAcess,
 
     // Contador de solicitações de amizade pendentes
     pendingRequestsCount: (state) => state.pendingRequestsCount,
@@ -46,6 +52,9 @@ export default createStore({
   },
 
   mutations: {
+    SET_FIRST_ACESS(state, value){
+      state.firstAcess = value
+    },
     TOGGLE_LOADING(state) {
       state.loading = !state.loading;
     },
@@ -83,15 +92,19 @@ export default createStore({
   },
 
   actions: {
+    setFirstAcess({commit}, value){
+      commit("SET_FIRST_ACESS", value);
+    },
+
     toogleLoading({ commit }) {
       commit("TOGGLE_LOADING");
     },
 
-    async validateToken({getters}){
+    async validateToken({getters, state}){
       const token = getters.getToken;
 
       try{
-        const response = await fetch("http://localhost:8080/api/auth/validade-token", {
+        const response = await fetch(`${state.apiUrl}/api/auth/validade-token`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -137,11 +150,14 @@ export default createStore({
           router.push("/login");
         }
       }
-    }
-    ,
+    },
+
+    logout({commit}){
+      commit("LOGOUT")
+    },
 
     // Busca solicitações pendentes de amizade
-    async fetchPendingRequests({ commit, getters }) {
+    async fetchPendingRequests({ commit, getters, state }) {
       const token = getters.getToken;
       if (!token) {
         console.error("⚠️ Token JWT ausente. Não foi possível buscar pendências.");
@@ -150,7 +166,7 @@ export default createStore({
 
       try {
         const response = await fetch(
-          `http://localhost:8080/api/users/${getters.getUser.username}/pending-friendships`,
+          `${state.apiUrl}/api/users/${getters.getUser.username}/pending-friendships`,
           {
             method: "GET",
             headers: {
@@ -185,14 +201,14 @@ export default createStore({
       }
     },
 
-    async updateUser({ commit, getters }, { field, value }) {
+    async updateUser({ commit, getters,state }, { field, value }) {
       try {
         const payload = {
           [field]: value
         };
-
+        
         const response = await fetch(
-          `http://localhost:8080/api/users/${getters.getUser.username}/${field}`,
+          `${state.apiUrl}/api/users/${getters.getUser.username}/${field}`,
           {
             method: "PATCH",
             headers: {
@@ -202,6 +218,8 @@ export default createStore({
             body: JSON.stringify(payload)
           }
         );
+
+        console.log("me pedoe", getters.getToken)
 
         if (response.ok) {
           const updatedUser = await response.json();
@@ -216,7 +234,7 @@ export default createStore({
       }
     },
 
-    async updateUserImage({commit, getters}, imagePath){
+    async updateUserImage({commit, getters,state}, imagePath){
       try{
         console.log("to no vuex:", imagePath);
         const payload = {
@@ -226,7 +244,7 @@ export default createStore({
         console.log("o pay ai", payload);
 
         const response = await fetch(
-          `http://localhost:8080/api/users/${getters.getUser.username}/image`,
+          `${state.apiUrl}/api/users/${getters.getUser.username}/image`,
           {
             method: "PATCH",
             headers: {
@@ -237,9 +255,16 @@ export default createStore({
           }
         );
 
+        console.log("oaaa", getters.getToken);
+
         if (response.ok) {
           const updatedUser = await response.json();
           commit("SET_USER", updatedUser);
+          toast.success("Photo Updated Successfully", {
+            autoClose: 1000,
+            position: "top-right",
+            theme: "dark",
+          });
         } else {
           const errorData = await response.json();
 
@@ -252,10 +277,10 @@ export default createStore({
     },
 
     // Busca lista de amigos
-    async fetchFriends({ commit, getters }) {
+    async fetchFriends({ commit, getters, state }) {
       try {
         const response = await fetch(
-          `http://localhost:8080/api/users/${getters.getUser.username}/friendships`,
+          `${state.apiUrl}/api/users/${getters.getUser.username}/friendships`,
           {
             method: "GET",
             headers: {
@@ -286,7 +311,7 @@ export default createStore({
     },
 
     // Busca lista de servidores
-    async fetchServers({ commit, getters }) {
+    async fetchServers({ commit, getters, state }) {
       try {
         const token = getters.getToken;
         if (!token) {
@@ -295,7 +320,7 @@ export default createStore({
         }
 
         const response = await fetch(
-          `http://localhost:8080/api/users/${getters.getUser.username}/servers`,
+          `${state.apiUrl}/api/users/${getters.getUser.username}/servers`,
           {
             method: "GET",
             headers: {
@@ -316,7 +341,7 @@ export default createStore({
       }
     },
 
-    async removeFriend({ commit, getters,dispatch }, friendshipId) {
+    async removeFriend({ commit, getters,dispatch,state }, friendshipId) {
       try {
         const token = getters.getToken;
         if (!token) {
@@ -325,7 +350,7 @@ export default createStore({
         }
 
         const response = await fetch(
-          `http://localhost:8080/api/friendships/${friendshipId}/remove`,
+          `${state.apiUrl}/api/friendships/${friendshipId}/remove`,
           {
             method: "PATCH",
             headers: {
@@ -350,7 +375,16 @@ export default createStore({
       console.log(imagePath)
       return imagePath ? `http://localhost:8080/api/files/images?file-id=${imagePath}`: 'no-photo.jpg';
     },
+
+    missing(){
+      toast.info("Sheiely didn't do it", {
+        autoClose: 1000,
+        position: "top-right",
+        theme: "dark",
+      });
+    }
   },
+
 
   modules: {
     chat: chatModule,

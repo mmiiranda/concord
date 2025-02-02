@@ -1,5 +1,5 @@
 <template>
-    <div class="mt-6">
+    <div class="mt-4 overflow-y-auto max-h-[80vh]">
         <h3 class="font-bold text-2xl mt-2">Profile</h3>
         <div class="px-1 md:px-12 max-w-screen-md mx-auto">
             <div class="bg-darkblue rounded-md flex flex-col md:flex-row justify-around gap-5 py-6 px-8 mt-4">
@@ -34,7 +34,10 @@
                 <div class="mt-2 text-xl">
                     <h3 class="font-bold text-gray">Password</h3>
                     <div class="w-48 text-lg mt-2">
-                        <ButtonAlt type="button" value="Change Password" />
+                        <ButtonAlt type="button"
+                            value="Change Password"
+                            @click="missing"
+                        />
                     </div>
                 </div>
                 <hr class="border-darkblue">    
@@ -43,8 +46,8 @@
                     <span class="text-base font-bold">
                         *After deleting the account, you will not have access to your messages
                     </span>
-                    <div class="w-48 text-lg mt-2">
-                        <ButtonAlt type="button" value="Delete account" class="bg-red" />
+                    <div class="w-48 text-lg">
+                        <ButtonAlt type="button" value="Delete account" class="bg-red" @click="missing" />
                     </div>
                 </div>
             </div>
@@ -69,7 +72,7 @@ import UpdateUserUsername from '@/components/form/UpdateUserUsername.vue';
 import ButtonAlt from '@/components/input/buttonAlt.vue';
 import FileAlt from '@/components/input/fileAlt.vue';
 import UpdateSetting from '@/components/input/updateSetting.vue';
-import { mapGetters } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 
 export default {
     name: "UserSettings",
@@ -94,8 +97,9 @@ export default {
         ...mapGetters(["getUser"])
     },
     methods: {
+        ...mapActions(["missing"]),
         getImage(imagePath) {
-            return imagePath ? `http://localhost:8080/api/files/images?file-id=${imagePath}` : 'no-photo.jpg';
+            return imagePath ? `${process.env.VUE_APP_API_URL}/api/files/images?file-id=${imagePath}` : 'no-photo.jpg';
         },
         toogleModalUpdateUsername() {
             this.IsModalUsername = !this.IsModalUsername;

@@ -21,8 +21,8 @@
                     </ul>   
                 </div>
             </div> -->
-            <div class="size-full grid px-4 md:px-10">
-                <div class="bg-[#363636] py-12 px-2 xl:px-12 rounded-t-lg flex flex-col">
+            <div class="size-full grid px-4 md:px-10 overflow-scroll">
+                <div class="bg-[#363636] py-8 px-2 xl:px-12 rounded-t-lg flex flex-col">
                     <h2 class="text-3xl ffont-bold font-bold">User Settings</h2>
                     <UserSettings />
                 </div>

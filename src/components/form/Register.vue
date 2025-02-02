@@ -2,7 +2,7 @@
     <div class="flex flex-col text-white gap-12 w-full">
         <div class="grid place-items-center">
             <img src="logo.svg" alt="Concord Logo">
-            <h1 class="font-bold text-3xl text-center">Registre-se no Concord</h1>
+            <h1 class="font-bold text-3xl text-center">Register on <span class="text-purple-600">Concord</span></h1>
         </div>
         <form @submit.prevent="handleSubmit" novalidate>
             <div class="flex flex-col gap-2">
@@ -11,7 +11,7 @@
                     type="text"
                     name="name"
                     id="Name"
-                    placeholder="Digite seu nome"
+                    placeholder="Enter your name"
                     required
                     minlength="2"
                 />
@@ -20,7 +20,7 @@
                     type="text"
                     name="username"
                     id="Username"
-                    placeholder="Escolha um username"
+                    placeholder="Choose a username"
                     required
                     minlength="5"
                 />
@@ -29,31 +29,31 @@
                     type="email"
                     name="email"
                     id="Email"
-                    placeholder="Seu email"
+                    placeholder="Choose a username"
                     required
                 />
                 <inputAlt
-                    label="Senha"
+                    label="Password"
                     type="password"
                     name="password"
                     id="Senha"
-                    placeholder="Crie uma senha"
+                    placeholder="Create a password"
                     required
                     minlength="8"
                 />
                 <inputAlt
-                    label="Confirme Senha"
+                    label="Confirm Password"
                     type="password"
                     name="senha_confirm"
                     id="Confirmar Senha"
-                    placeholder="Confirme sua senha"
+                    placeholder="Confirm your password"
                     required
                 />
             </div>
             <div class="text-sm flex gap-2 mt-1">
                     <checkboxAlt name="Campo de Termos" id="Termos" required />
                     <span>
-                        Eu aceito os <a href="#" class="text-blue">Termos de Serviço</a> e a <a href="#" class="text-blue">Política de Privacidade</a>
+                        I agree to the  <a href="#" class="text-blue">Terms of Service </a> and <a href="#" class="text-blue">Privacy Policy</a>
                     </span>
             </div>
             <buttonAlt type="submit" value="Registrar" class="mt-6 " />
@@ -81,7 +81,7 @@ export default {
             const inputs = form.querySelectorAll("input, select, textarea");
             for (const input of inputs) {
                 if (!input.validity.valid) {
-                    this.$toast(`Erro no campo "${input.id}": ${input.validationMessage}`, "error");
+                    this.$toast(`Error in the field "${input.id}": ${input.validationMessage}`, "error");
                     break;
                 }
             }
@@ -90,7 +90,7 @@ export default {
                 const confirmPassword = form.querySelector("[name='senha_confirm']").value;
 
                 if (password !== confirmPassword) {
-                    this.$toast("As senhas não coincidem. Tente novamente.", "error");
+                    this.$toast("Passwords do not match. Please try again.", "error");
                     return;
                 }
                 this.createAccount();
@@ -110,19 +110,20 @@ export default {
 
             try {
                 this.emitLOading()
-                const response = await fetch("http://localhost:8080/api/auth/register", {
+                const response = await fetch(`${process.env.VUE_APP_API_URL}/api/auth/register`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(json)
                 });
                 if (response.status === 202) {
                     this.emitLOading()
-                    this.$router.push("/confirmarEmail");
+                    this.$router.push("/confirm-email");
                 } else {
-                    this.$toast("Registro Incorreto", "error");
+                    this.$toast("Invalid Registration", "error");
+                    this.emitLOading()
                 }
             } catch (err) {
-                this.$toast("Algum Problema foi Encontrado", "error");
+                this.$toast("Any Problem Found", "error");
             }
         },
         emitLOading(){

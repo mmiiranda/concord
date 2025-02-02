@@ -3,7 +3,7 @@
     justify-around overflow-hidden">
         <div>
             <div class="bg-darkblue text-white p-6 rounded-lg h-full">
-                <h2 class="font-bold text-2xl">Redefinir Senha</h2>
+                <h2 class="font-bold text-2xl">Reset Password</h2>
                 <ResetPassword class="mt-4"/>
             </div>
         </div>

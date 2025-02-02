@@ -31,7 +31,7 @@ export default {
     },
     methods:{
         getImage(imagePath){
-            return imagePath ? `http://localhost:8080/api/files/images?file-id=${imagePath}`: 'no-photo.jpg';
+            return imagePath ? `${process.env.VUE_APP_API_URL}/api/files/images?file-id=${imagePath}`: 'no-photo.jpg';
         },
     }
     

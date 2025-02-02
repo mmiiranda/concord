@@ -5,10 +5,10 @@
       <RegisterForm @loading="toogleLoading" v-else/>
       <div class="text-white mt-6">
         <div v-if="Isregister == 0">
-          Não tem uma conta? <span class="text-blue cursor-pointer" @click="toogleForm">Registre-se</span>
+          Don't have an account?  <span class="text-blue cursor-pointer" @click="toogleForm">Sign Up</span>
         </div>
         <div v-else>
-          Já conta? <span class="text-blue cursor-pointer" @click="toogleForm">Log In</span>
+          Already have an account? <span class="text-blue cursor-pointer" @click="toogleForm">Log In</span>
         </div>
       </div>
     </div>

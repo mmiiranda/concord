@@ -77,7 +77,6 @@ export default {
             const data = new FormData(form);
             const json = Object.fromEntries(data.entries());
             
-            console.log(json);
             this.toogleLoading();
             try {
                 const response = await fetch(`http://${process.env.VUE_APP_API_URL}/api/auth/login`, {

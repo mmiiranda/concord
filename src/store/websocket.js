@@ -86,6 +86,7 @@ const actions = {
 
         const newMsg = {
           id: message.content.id || message.content.timestamp,
+          fromUserId: message.content.fromUserId, // Adicione isto!
           timestamp: message.content.timestamp || new Date().toISOString(),
           senderAvatar: message.content.senderAvatar || "no-photo.jpg",
           content: message.content.message,
@@ -122,7 +123,7 @@ const actions = {
         console.log("📤 Nova solicitação de amizade recebida!");
         console.log(message.content)
         if(message.content.status == "PENDING"){
-          toast.info("Você tem uma nova solicitação de amizade!", {
+          toast.info("You have a new friend request!", {
             autoClose: 3000,
             position: "top-right",
             theme: "dark",

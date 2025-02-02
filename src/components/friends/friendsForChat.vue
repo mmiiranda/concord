@@ -63,6 +63,10 @@
           return imagePath ? `http://${process.env.VUE_APP_API_URL}/api/files/images?file-id=${imagePath}`: 'no-photo.jpg';
       },
       async openChat(friend) {
+        if (this.activeChat && this.activeChat.id === friend.id && this.activeChat.type === "dm") {
+          return;
+        }
+
         this.setActiveChat({
           id: friend.id,
           name: friend.username, // Pode ajustar para 'friend.name' se preferir

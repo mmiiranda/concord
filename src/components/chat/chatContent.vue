@@ -15,7 +15,7 @@
           <MessageChat
           :name="OwnerMessage(message.fromUserId)"
           :msgTimestamp="message.timestamp"
-          :src="getImageOwner(chatData.imagePath, message.fromUserId) || 'no-photo.jpg'"
+          :src="getImageOwner(message.fromUserId) || 'no-photo.jpg'"
           :message="message.content"
       />
       </div>
@@ -66,10 +66,9 @@ export default {
     ...mapActions("websocket", ["sendMessage", "fetchChatMessages"]),
 
 
-    getImageOwner(imagePath, ownerId){
-      if(imagePath == null) return "no-photo.jpg"
+    getImageOwner(ownerId){
       if(ownerId == this.getUser.id) return this.getImage(this.getUser.imagePath);
-      return this.getImage(this.chatData.imagePath)
+      return this.getImage(this.chatData.imagePath) 
     },
 
     getImage(imagePath){

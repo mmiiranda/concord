@@ -2,7 +2,7 @@
     <div 
     :class="[
       'fixed bg-[#363636] text-white w-full flex flex-col min-h-screen',
-      isPageOptionOpen ? 'mt-0' : 'mt-[90vh]'
+      isPageOptionOpen ? 'mt-0' : 'mt-[90dvh]'
     ]">
         <headerFooter 
         @toogle-config="toogleConfig"

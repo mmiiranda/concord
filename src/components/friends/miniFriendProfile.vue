@@ -31,7 +31,7 @@
         methods: {
             getImage(imagePath){
                 console.log(imagePath)
-                return imagePath ? `${process.env.VUE_APP_API_URL}/api/files/images?file-id=${imagePath}`: 'no-photo.jpg';
+                return imagePath ? `http://${process.env.VUE_APP_API_URL}/api/files/images?file-id=${imagePath}`: 'no-photo.jpg';
             },
         }
     }

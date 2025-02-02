@@ -110,7 +110,7 @@ export default {
 
             try {
                 this.emitLOading()
-                const response = await fetch(`${process.env.VUE_APP_API_URL}/api/auth/register`, {
+                const response = await fetch(`http://${process.env.VUE_APP_API_URL}/api/auth/register`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(json)

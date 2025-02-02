@@ -103,7 +103,7 @@ export default {
             };
 
             try {
-                const response = await fetch(`${process.env.VUE_APP_API_URL}/api/servers`, {
+                const response = await fetch(`http://${process.env.VUE_APP_API_URL}/api/servers`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

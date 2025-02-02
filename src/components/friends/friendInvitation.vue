@@ -80,13 +80,13 @@ import { mapGetters } from 'vuex';
          },
          methods: {
             getImage(imagePath){
-                return imagePath ? `${process.env.VUE_APP_API_URL}/api/files/images?file-id=${imagePath}`: 'no-photo.jpg';
+                return imagePath ? `http://${process.env.VUE_APP_API_URL}/api/files/images?file-id=${imagePath}`: 'no-photo.jpg';
             },
             async submitRequest(event){
                 try{
                     const value = event.submitter.getAttribute("data-value");   
 
-                    const response = await fetch(`${process.env.VUE_APP_API_URL}/api/friendships/${this.id}/${value}`,{
+                    const response = await fetch(`http://${process.env.VUE_APP_API_URL}/api/friendships/${this.id}/${value}`,{
                             method: 'PATCH',
                             headers: {
                             "Content-Type": "application/json",

@@ -92,7 +92,7 @@ import ModalOverlay from '../modal/modalOverlay.vue';
                 const token = localStorage.getItem("token");
 
                 try {
-                    const response = await fetch(`${process.env.VUE_APP_API_URL}/api/files/images`, {
+                    const response = await fetch(`http://${process.env.VUE_APP_API_URL}/api/files/images`, {
                         method: "POST",
                         body: formData,
                         headers: {

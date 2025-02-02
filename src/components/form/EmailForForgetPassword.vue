@@ -81,7 +81,7 @@ export default {
 
             this.$toast("Verificando Email", "loading")
             try {
-                const response = await fetch(`${process.env.VUE_APP_API_URL}/api/auth/forgot-password`, {
+                const response = await fetch(`http://${process.env.VUE_APP_API_URL}/api/auth/forgot-password`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"

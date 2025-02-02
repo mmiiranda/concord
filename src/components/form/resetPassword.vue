@@ -89,7 +89,7 @@ export default {
 
             this.toogleLoading()
             try {
-                const response = await fetch(`${process.env.VUE_APP_API_URL}/api/auth/reset-password?token=${token}`, {
+                const response = await fetch(`http://${process.env.VUE_APP_API_URL}/api/auth/reset-password?token=${token}`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"

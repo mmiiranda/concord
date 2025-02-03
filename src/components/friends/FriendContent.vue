@@ -172,7 +172,7 @@ export default {
         // Enviar solicitação de amizade
         async sendRequest() {
             if (!this.newFriend.trim()) {
-                this.$toast("Insira um nome válido", "error");
+                this.$toast("Enter a valid name", "error");
                 return;
             }
 

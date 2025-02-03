@@ -62,6 +62,10 @@ export default {
     },
 
     async openDm(friend) {
+      if (this.activeChat && this.activeChat.id === friend.id && this.activeChat.type === "dm") {
+        return;
+      }
+
       this.setActiveChat({
         id: friend.id,
         name: friend.username,

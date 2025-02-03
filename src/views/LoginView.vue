@@ -14,7 +14,7 @@
     </div>
     <div class="xl:w-full xl:grid place-items-center hidden">
       <div class="w-1/3">
-        <img src="../assets/LoginImage.svg" alt="Jovem olhando um notebook  ">
+        <img src="../assets/LoginImage.png" alt="Jovem olhando um notebook  ">
       </div>
     </div>
   </div>

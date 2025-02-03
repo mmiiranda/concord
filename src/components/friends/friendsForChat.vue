@@ -69,7 +69,7 @@
 
         this.setActiveChat({
           id: friend.id,
-          name: friend.username, // Pode ajustar para 'friend.name' se preferir
+          name: friend.username, 
           type: "dm" ,
           imagePath: friend.imagePath
         });

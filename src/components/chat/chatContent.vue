@@ -157,29 +157,34 @@ export default {
   },
 
   watch: {
-  chatData: {
-    immediate: true,
-    handler() {
-      // Zera mensagens e reinicia paginação
-      this.$store.commit("websocket/SET_MESSAGES", []);
-      this.page = 0;
-      this.hasMoreMessages = true;
-      this.isLoadingOlder = false;
+    chatData: {
+      immediate: true,
+      handler() {
 
-      // Carrega a primeira página
-      this.fetchChatMessages({
-        toUserId: this.chatData.id,
-        fromUserId: this.getUser.id,
-        page: this.page,
-        size: this.size,
-      }).then((msgs) => {
-        if (!msgs || msgs.length < this.size) {
-          this.hasMoreMessages = false;
-        }
-      });
+        this.$store.commit("websocket/RESET_MESSAGES");
+        this.page = 0;
+        this.hasMoreMessages = true;
+        this.isLoadingOlder = false;
+
+        if (!this.chatData.id) return;
+
+
+        
+        this.$nextTick(() => {
+          this.fetchChatMessages({
+            toUserId: this.chatData.id,
+            fromUserId: this.getUser.id,
+            page: this.page,
+            size: this.size,
+          }).then((msgs) => {
+            if (!msgs || msgs.length < this.size) {
+              this.hasMoreMessages = false;
+            }
+          });
+        });
+      },
     },
   },
-},
 
 };
 </script>

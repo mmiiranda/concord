@@ -81,7 +81,7 @@
                       :username="friendship.friend.username"
                       :origin="friendship.origin"
                       :destination="friendship.friend.id"
-                      :src="friendship.friend.foto"
+                      :src="friendship.friend.imagePath"
                       @submited="reset"
                   />
                 </div>

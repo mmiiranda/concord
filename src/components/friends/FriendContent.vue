@@ -181,7 +181,7 @@ export default {
             };
 
             try {
-                const response = await fetch(`http://${process.env.VUE_APP_API_URL}/api/friendships`, {
+                const response = await fetch(`${process.env.VUE_APP_API_URL}/api/friendships`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

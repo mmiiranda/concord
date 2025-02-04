@@ -25,7 +25,7 @@ class WebSocketService {
     this.token = token;
     console.log("🔄 Tentando conectar ao WebSocket com token:", token);
 
-    this.socket = new WebSocket(`ws://${process.env.VUE_APP_API_URL}/ws`);
+    this.socket = new WebSocket(`${process.env.VUE_APP_WS_URL}/ws`);
 
     this.socket.onopen = () => {
       console.log("✅ WebSocket conectado com sucesso!");

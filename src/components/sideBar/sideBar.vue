@@ -121,14 +121,14 @@ export default {
     // Função para obter a imagem do amigo
     getImage(friend) {
       return friend.imagePath 
-        ? `http://${process.env.VUE_APP_API_URL}/api/files/images?file-id=${friend.imagePath}` 
+        ? `${process.env.VUE_APP_API_URL}/api/files/images?file-id=${friend.imagePath}` 
         : "no-photo.jpg";
     },
 
     // Função para obter a imagem do servidor
     getServerImage(server){
       return server.imagePath 
-        ? `http://${process.env.VUE_APP_API_URL}/api/files/images?file-id=${server.imagePath}` 
+        ? `${process.env.VUE_APP_API_URL}/api/files/images?file-id=${server.imagePath}` 
         : null // Use uma imagem padrão
     },
     

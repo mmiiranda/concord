@@ -106,7 +106,7 @@ export default createStore({
       if(!token) return false
 
       try{
-        const response = await fetch(`http://${state.apiUrl}/api/auth/validade-token`, {
+        const response = await fetch(`${state.apiUrl}/api/auth/validade-token`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -171,7 +171,7 @@ export default createStore({
 
       try {
         const response = await fetch(
-          `http://${state.apiUrl}/api/users/${getters.getUser.username}/pending-friendships`,
+          `${state.apiUrl}/api/users/${getters.getUser.username}/pending-friendships`,
           {
             method: "GET",
             headers: {
@@ -213,7 +213,7 @@ export default createStore({
         };
 
         const response = await fetch(
-          `http://${state.apiUrl}/api/users/${getters.getUser.username}/${field}`,
+          `${state.apiUrl}/api/users/${getters.getUser.username}/${field}`,
           {
             method: "PATCH",
             headers: {
@@ -249,7 +249,7 @@ export default createStore({
         console.log("o pay ai", payload);
 
         const response = await fetch(
-          `http://${state.apiUrl}/api/users/${getters.getUser.username}/image`,
+          `${state.apiUrl}/api/users/${getters.getUser.username}/image`,
           {
             method: "PATCH",
             headers: {
@@ -285,7 +285,7 @@ export default createStore({
     async fetchFriends({ commit, getters, state }) {
       try {
         const response = await fetch(
-          `http://${state.apiUrl}/api/users/${getters.getUser.username}/friendships`,
+          `${state.apiUrl}/api/users/${getters.getUser.username}/friendships`,
           {
             method: "GET",
             headers: {
@@ -325,7 +325,7 @@ export default createStore({
         }
 
         const response = await fetch(
-          `http://${state.apiUrl}/api/users/${getters.getUser.username}/servers`,
+          `${state.apiUrl}/api/users/${getters.getUser.username}/servers`,
           {
             method: "GET",
             headers: {
@@ -355,7 +355,7 @@ export default createStore({
         }
 
         const response = await fetch(
-          `http://${state.apiUrl}/api/friendships/${friendshipId}/remove`,
+          `${state.apiUrl}/api/friendships/${friendshipId}/remove`,
           {
             method: "PATCH",
             headers: {
@@ -378,7 +378,7 @@ export default createStore({
     },
     getImage({state},imagePath){
       console.log(imagePath)
-      return imagePath ? `http://${state.apiUrl}/api/files/images?file-id=${imagePath}`: 'no-photo.jpg';
+      return imagePath ? `${state.apiUrl}/api/files/images?file-id=${imagePath}`: 'no-photo.jpg';
     },
 
     missing(){

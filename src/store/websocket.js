@@ -154,7 +154,7 @@ const actions = {
       return [];
     }
 
-    const endpoint = `http://${state.apiUrl}/api/messages/chat?toUserId=${toUserId}&fromUserId=${fromUserId}&page=${page}&size=${size}&sort=timestamp,desc`;
+    const endpoint = `${state.apiUrl}/api/messages/chat?toUserId=${toUserId}&fromUserId=${fromUserId}&page=${page}&size=${size}&sort=timestamp,desc`;
     try {
       const response = await fetch(endpoint, {
         headers: {
@@ -186,7 +186,7 @@ const actions = {
       return [];
     }
 
-    const endpoint = `http://${state.apiUrl}/api/messages/unread-chats`;
+    const endpoint = `${state.apiUrl}/api/messages/unread-chats`;
     try {
       const response = await fetch(endpoint, {
         headers: {
@@ -216,7 +216,7 @@ const actions = {
       return;
     }
 
-    const endpoint = `http://${state.apiUrl}/api/messages/read`;
+    const endpoint = `${state.apiUrl}/api/messages/read`;
     try {
       const response = await fetch(endpoint, {
         method: "PATCH",

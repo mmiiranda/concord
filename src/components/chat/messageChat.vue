@@ -45,13 +45,13 @@ export default {
             const date = new Date(this.msgTimestamp);
             const today = new Date();
 
-            // Verifica se a data da mensagem é a mesma de hoje
+            
             const isToday = 
                 date.getDate() === today.getDate() &&
                 date.getMonth() === today.getMonth() &&
                 date.getFullYear() === today.getFullYear();
 
-            return isToday ? "Hoje" : date.toLocaleDateString(undefined, {
+            return isToday ? "Today" : date.toLocaleDateString(undefined, {
                 year: "numeric",
                 month: "numeric",
                 day: "numeric"

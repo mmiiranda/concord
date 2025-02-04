@@ -58,10 +58,10 @@ export default {
                 return;
             }
 
-            // Dispatch da ação Vuex para atualizar o name
+            
             await this.updateUser({ field: 'name', value: this.newName });
 
-            // Emitir o evento para fechar o modal após a atualização
+            
             this.$toast(`Nome alterado com sucesso`, "success")
             this.emitClose();
         },

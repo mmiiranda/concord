@@ -1,5 +1,5 @@
 <template>
-    <div class="mt-4 overflow-y-auto max-h-[80dvh]">
+    <div class="mt-4">
         <h3 class="font-bold text-2xl mt-2">Profile</h3>
         <div class="px-1 md:px-12 max-w-screen-md mx-auto">
             <div class="bg-darkblue rounded-md flex flex-col md:flex-row justify-around gap-5 py-6 px-8 mt-4">
@@ -54,7 +54,6 @@
         </div>
     </div>
 
-    <!-- Modais -->
     <UpdateUserUsername @close="toogleModalUpdateUsername" v-show="IsModalUsername" :username="getUser.username" />
     <UpdateUserName @close="toogleModalUpdateName" v-show="IsModalName" :name="getUser.name" />
     <UpdateUserPhoto 

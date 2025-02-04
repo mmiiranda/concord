@@ -7,17 +7,24 @@
       class="h-full overflow-y-auto flex flex-col-reverse gap-2 border-t-2 border-darkblue"
       @scroll.passive="handleScroll"
     >
-      <div 
-        v-for="message in messages" 
-        :key="message.id || message.timestamp" 
-        class="message"
-      >
+      <div v-for="(messages, date) in groupedMessages" :key="date">
+
+        <div class="text-center text-gray-500 text-sm font-semibold py-2">
+          <span class="bg-purple-700 p-1"> {{ formatDate(date) }}</span>
+        </div>
+
+        <div 
+          v-for="message in messages" 
+          :key="message.id || message.timestamp" 
+          class="message"
+        >
           <MessageChat
-          :name="OwnerMessage(message.fromUserId)"
-          :msgTimestamp="message.timestamp"
-          :src="getImageOwner(message.fromUserId) || 'no-photo.jpg'"
-          :message="message.content"
-      />
+            :name="OwnerMessage(message.fromUserId)"
+            :msgTimestamp="message.timestamp"
+            :src="getImageOwner(message.fromUserId) || 'no-photo.jpg'"
+            :message="message.content"
+          />
+        </div>
       </div>
     </div>
 
@@ -49,22 +56,35 @@ export default {
       page: 0,
       size: 20,
       hasMoreMessages: true,
-      isLoadingOlder: false, // Flag para evitar múltiplos loads ao mesmo tempo
+      isLoadingOlder: false, 
       container: this.$refs.messageContainer
     };
   },
   computed: {
     ...mapGetters(["getToken", "getUser"]),
     ...mapGetters("websocket", ["messages", "isConnected"]),
+
     chatTitle() {
       return this.chatData.type === "server"
         ? `${this.chatData.name}`
         : `${this.chatData.name}`;
     },
+    
+    groupedMessages() {
+      if (!this.messages || this.messages.length === 0) return {};
+
+      return this.messages.reduce((groups, message) => {
+        const messageDate = new Date(message.timestamp).toLocaleDateString();
+        if (!groups[messageDate]) {
+          groups[messageDate] = [];
+        }
+        groups[messageDate].unshift(message); 
+        return groups;
+      }, {});
+    }
   },
   methods: {
     ...mapActions("websocket", ["sendMessage", "fetchChatMessages"]),
-
 
     getImageOwner(ownerId){
       if(ownerId == this.getUser.id) return this.getImage(this.getUser.imagePath);
@@ -99,36 +119,27 @@ export default {
       this.$nextTick(() => {
         this.container = 0
       });
-
     },
 
     OwnerMessage(id) {
       return id == this.getUser.id ? this.getUser.username : this.chatData.name;
     },
 
-     handleScroll() {
+    handleScroll() {
       const container = this.$refs.messageContainer;
-      console.log(container.scrollTop)
       if (this.isLoadingOlder || !this.hasMoreMessages) return;
 
-
-     
       if (!container) return;
 
-
       const offset = -799; 
-      console.log(container.scrollTop)
       if (container.scrollTop <= offset * (this.page * 2)) {
-        console.log(container.scrollTop)
         console.log("🔄 Scroll atingiu topo, carregando mais mensagens...");
         this.loadOlderMessages();
       }
     },
 
-
     async loadOlderMessages() {
       this.isLoadingOlder = true;
-
       this.page += 1;
       console.log(`🔎 Buscando página ${this.page} de mensagens antigas...`);
 
@@ -152,7 +163,35 @@ export default {
         console.error("❌ Erro ao carregar mensagens antigas:", error);
         this.isLoadingOlder = false;
       }
-  }
+    },
+
+    formatDate(dateString) {
+      const today = new Date();
+      
+      const [day, month, year] = dateString.split("/"); 
+      const messageDate = new Date(`${year}-${month}-${day}T00:00:00`); 
+
+      today.setHours(0, 0, 0, 0);
+      messageDate.setHours(0, 0, 0, 0);
+
+      const yesterday = new Date(today);
+      yesterday.setDate(today.getDate() - 1);
+
+      if (messageDate.getTime() === today.getTime()) {
+        return "Today";
+      }
+
+      if (messageDate.getTime() === yesterday.getTime()) {
+        return "Yesterday";
+      }
+
+      return messageDate.toLocaleDateString("en-US", {
+        month: "short", 
+        day: "2-digit", 
+        year: "numeric", 
+      });
+    }
+
 
   },
 
@@ -160,7 +199,6 @@ export default {
     chatData: {
       immediate: true,
       handler() {
-
         this.$store.commit("websocket/RESET_MESSAGES");
         this.page = 0;
         this.hasMoreMessages = true;
@@ -168,8 +206,6 @@ export default {
 
         if (!this.chatData.id) return;
 
-
-        
         this.$nextTick(() => {
           this.fetchChatMessages({
             toUserId: this.chatData.id,
@@ -185,7 +221,6 @@ export default {
       },
     },
   },
-
 };
 </script>
 

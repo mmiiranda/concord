@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-[90vh] bg-[#272727] fixed z-50 md:relative  md:flex">
+  <div class="flex h-[calc(100dvh-5rem)] bg-[#272727] fixed z-50 md:relative  md:flex">
     <div class="flex flex-col items-center py-6 px-1">
       <div class="flex flex-col items-center  gap-1">
 
@@ -26,7 +26,7 @@
                 @click="openChat(friend)"
                 class="opacity-80 hover:opacity-100"
               />
-              <!-- Badge de mensagens não lidas -->
+
               <span class="absolute top-0 right-0 font-bold bg-red text-white rounded-full px-2 py-0.5 text-xs">
                 {{ getUnreadCount(friend.id) }}
               </span>
@@ -35,8 +35,7 @@
         </div>
 
         <div class="w-4/5 bg-hovergray h-[3px] mt-2"></div>
-
-        <!-- Lista de servidores -->
+        
         <div class="flex flex-col gap-3">
           <MiniServerIcon
             v-for="server in servers"
@@ -46,7 +45,6 @@
             @click="openServerChat(server)"
           />
 
-          <!-- Ícone que abre o modal de criar servidor -->
           <CreateServerIcon @click="missing" />
         </div>
       </div>
@@ -70,7 +68,6 @@
       </div>
     </transition>
 
-    <!-- Modal para criar novo servidor -->
     <CreateServer 
       v-if="ModalCreateServer" 
       @close="toggleModalCreateServer"

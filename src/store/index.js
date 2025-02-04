@@ -121,11 +121,8 @@ export default createStore({
       }
     },
 
-    // Realiza login e configura store + WebSocket
+    
     async login({ commit, dispatch }) {
-      console.log("chamou a funco login");
-      console.log("token:"+localStorage.getItem("token"));
-      console.log(typeof localStorage.getItem("token"));
       const token = localStorage.getItem("token");
       
       if (token) {
@@ -133,8 +130,8 @@ export default createStore({
         commit("SET_TOKEN", localStorage.getItem("token"));
     
         try {
-          const response = await dispatch("validateToken"); // Aguarda a resposta correta
-          const isValid = await response.json(); // Converte a resposta para JSON
+          const response = await dispatch("validateToken"); 
+          const isValid = await response.json(); 
     
           if (!isValid) {
             router.push("/login");
@@ -162,7 +159,7 @@ export default createStore({
       commit("LOGOUT")
     },
 
-    // Busca solicitações pendentes de amizade
+    
     async fetchPendingRequests({ commit, getters, state }) {
       const token = getters.getToken;
       if (!token) {
@@ -224,12 +221,16 @@ export default createStore({
           }
         );
 
-        console.log("me pedoe", getters.getToken)
 
         if (response.ok) {
           const updatedUser = await response.json();
           commit("SET_USER", updatedUser);
           console.log(`✅ ${field} atualizado com sucesso.`);
+          toast.success(`${field} Updated Successfully`, {
+            autoClose: 1000,
+            position: "top-right",
+            theme: "dark",
+          });
         } else {
           const errorData = await response.json();
           console.error(`Erro ao atualizar ${field}:`, errorData);
@@ -275,6 +276,11 @@ export default createStore({
 
           console.error(`Erro ao atualizar`, response);
           console.error(`Erro ao atualizar`, errorData);
+          toast.error("Error Photo Updated", {
+            autoClose: 1000,
+            position: "top-right",
+            theme: "dark",
+          });
         }
       }catch(err){
         console.log(err)

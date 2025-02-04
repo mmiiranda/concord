@@ -1,5 +1,5 @@
 <template>
-    <div class="flex text-white bg-darkblue w-full px-2 rounded-md">
+    <div class="flex text-white bg-[#202020] w-full px-2 rounded-md">
         <label :for="id" class="grid place-items-center">
             <img src="../icon/Search.svg" alt="Icone de Busca">
         </label>

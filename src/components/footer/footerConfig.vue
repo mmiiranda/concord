@@ -2,7 +2,7 @@
     <div 
     :class="[
       'fixed bg-[#363636] text-white w-full flex flex-col min-h-screen',
-      isPageOptionOpen ? 'translate-y-0' : 'translate-y-[calc(100vh-5rem)]'
+      isPageOptionOpen ? 'translate-y-0' : 'translate-y-[calc(100dvh-5rem)]'
     ]">
         <headerFooter 
         @toogle-config="toogleConfig"

@@ -1,11 +1,11 @@
 <template>
     <div class="flex gap-4">
-        <!-- Avatar -->
+
         <div class="w-10 h-10 rounded-full overflow-hidden mt-2">
             <img :src="src" class="w-full h-full object-cover"/>
         </div>
 
-        <!-- Mensagem -->
+        
         <div class="w-full">
             <h4 class="font-bold text-xl"> {{ name }} </h4>
             <h5 class="text-gray text-sm font-bold -mt-1"> {{ formattedDate }}, {{ formattedHour }} </h5>
@@ -30,7 +30,7 @@ export default {
             required: true
         },
         msgTimestamp: {
-            type: [String, Number], // Aceita String ou Número
+            type: [String, Number], 
             required: true
         },
         message: {
@@ -41,17 +41,29 @@ export default {
     computed: {
         formattedDate() {
             if (!this.msgTimestamp) return "";
-            
+
             const date = new Date(this.msgTimestamp);
             const today = new Date();
 
-            
-            const isToday = 
+
+            const isToday =
                 date.getDate() === today.getDate() &&
                 date.getMonth() === today.getMonth() &&
                 date.getFullYear() === today.getFullYear();
 
-            return isToday ? "Today" : date.toLocaleDateString(undefined, {
+
+            const yesterday = new Date(today);
+            yesterday.setDate(today.getDate() - 1); 
+
+            const isYesterday =
+                date.getDate() === yesterday.getDate() &&
+                date.getMonth() === yesterday.getMonth() &&
+                date.getFullYear() === yesterday.getFullYear();
+
+            if (isYesterday) return "Yesterday";
+            if (isToday) return "Today";
+
+            return date.toLocaleDateString(undefined, {
                 year: "numeric",
                 month: "numeric",
                 day: "numeric"
@@ -64,7 +76,7 @@ export default {
             return date.toLocaleTimeString(undefined, {
                 hour: "2-digit",
                 minute: "2-digit",
-                hour12: false
+                hour12: true
             });
         }
     }

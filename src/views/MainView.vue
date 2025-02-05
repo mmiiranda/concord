@@ -3,8 +3,9 @@
     <div v-if="isSidebarOpen" class="relative">
       <sideBar />
     </div>
-    <div class="absolute" v-else>
+    <div class="absolute z-20" v-else>
       <IconButton 
+        id="openSidebarButton"
         type="button"
         :src="icon.MenuIcon"
         @click="openSidebar"
@@ -15,9 +16,10 @@
       <ChatContent v-else :chatData="activeChat" />
       <RightSideBar />
     </div>
-    <footerConfig class="z-50" />
     <FirstAcessModal v-show="getFirstAcess"/>
+    <footerConfig class="z-50" />
   </div>
+
 </template>
 
 <script>
@@ -53,12 +55,12 @@ export default {
   },
   computed: {
     ...mapGetters("chat", ["getActiveChat"]),
+    ...mapGetters("mobile", ["isSidebarOpen", "isMobile"]),
+    ...mapGetters(["getFirstAcess"]),
     activeChat() {
       console.log("dskldsldksldksldksl", this.getActiveChat)
       return this.getActiveChat;
     },
-    ...mapGetters("mobile", ["isSidebarOpen", "isMobile"]),
-    ...mapGetters(["getFirstAcess"])
   },
   methods: {
     ...mapActions("chat", ["setActiveChat"]),
@@ -68,6 +70,7 @@ export default {
       this.screenWidth = window.innerWidth;
       this.detectMobile();
     },
+    
   },
   async created() {
     this.isLoggedIn = await this.login();
@@ -76,7 +79,6 @@ export default {
   mounted() {
     this.detectMobile(); 
     window.addEventListener("resize", this.handleResize);
-    console.log("primeiro acesso?",this.getFirstAcess)
   },
   beforeUnmount() {
     window.removeEventListener("resize", this.handleResize);

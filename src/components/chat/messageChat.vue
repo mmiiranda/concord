@@ -6,7 +6,7 @@
         </div>
 
         
-        <div class="w-full">
+        <div class="w-auto">
             <h4 class="font-bold text-xl"> {{ name }} </h4>
             <h5 class="text-gray text-sm font-bold -mt-1"> {{ formattedDate }}, {{ formattedHour }} </h5>
 

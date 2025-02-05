@@ -7,17 +7,20 @@
             </div>
             <p class="text-xl">Enter the code that was sent to your email</p>
            <CodeForm v-on:loading="toogleLoading"/>
-            
+            <p>Is this your email? <a href="#" class="text-purple-500 underline"> {{ user.email }} </a></p>
         </div>
     </div>
 </template>
 
 <script>
 import CodeForm from "@/components/form/codeForm.vue";
-import { mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 
     export default {
         name: "ConfirmarEmailView",
+        computed: {
+            ...mapGetters("register", ["user"])
+        },
         methods: {
           ...mapActions(["toogleLoading"])
         },

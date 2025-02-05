@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-[calc(100dvh-5rem)] bg-[#272727] fixed z-50 md:relative  md:flex">
+  <div class="flex h-[calc(100dvh-5rem)] bg-[#272727] fixed z-50 md:relative  md:flex" ref="sidebar">
     <div class="flex flex-col items-center py-6 px-1">
       <div class="flex flex-col items-center  gap-1">
 
@@ -57,12 +57,12 @@
         class="bg-[#363636] flex flex-col  text-white min-w-48 relative"
       >
         <div>
-          <div 
+          <!-- <div 
             class="absolute right-3 top-3 cursor-pointer block md:hidden"
             @click="closeSidebar"
           >
             X
-          </div>
+          </div> -->
           <HomeSideBarContent />
         </div>
       </div>
@@ -95,11 +95,13 @@ export default {
     return {
       isOpen: true,
       ModalCreateServer: false,
+      mobileMenuAux: false,
     };
   },
   computed: {
     ...mapGetters("websocket", ["unreadChats", "users"]),
     ...mapGetters(["getFriendsWithPendingMessages", "getServers"]),
+    ...mapGetters("mobile",["isMobile","isSidebarOpen"]),
     friendsWithPendingMessages() {
       console.log(this.$store.getters.getFriendsWithPendingMessages);
       return this.$store.getters.getFriendsWithPendingMessages;
@@ -176,20 +178,29 @@ export default {
       this.closeSidebar()
     },
     
+    checkController(){
+      if(this.mobileMenuAux) this.closeSidebar();
+    },
+
     toggleModalCreateServer() {
       this.ModalCreateServer = !this.ModalCreateServer;
       console.log(`🔄 Modal de criação de servidor está agora: ${this.ModalCreateServer ? 'Aberto' : 'Fechado'}`);
     },
+
+    handleClickOutsideSideBar(event){
+      console.log("mobile", this["isMobile,isSidebarOpen"])
+      if(this.$refs.sidebar && !this.$refs.sidebar.contains(event.target) && this.isMobile && this.isSidebarOpen){
+        this.checkController()
+        this.mobileMenuAux = !this.mobileMenuAux
+      }
+      
+    }
   },
   mounted() {
-    const token = this.$store.getters["getToken"];
-    if (token) {
-      this.$store.dispatch("websocket/connectWebSocket", token);
-      this.$store.dispatch("websocket/fetchUnreadChats");   
-      this.$store.dispatch("fetchServers"); // Chama fetchServers do módulo raiz
-    } else {
-      console.error("⚠️ Token JWT não encontrado. Não foi possível conectar ao WebSocket.");
-    }
+      document.addEventListener("click", this.handleClickOutsideSideBar);
+    },
+  beforeUnmount() {
+      document.removeEventListener("click", this.handleClickOutsideSideBar);
   },
 };
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full w-full flex flex-col gap-4 px-10 py-6">
+  <div class="h-full w-full flex flex-col gap-4 px-10 py-6 animate-spawn">
     <h2 class="font-bold text-lg text-center md:text-left">{{ chatTitle }}</h2>
 
     <div 
@@ -10,13 +10,12 @@
       <div v-for="(messages, date) in groupedMessages" :key="date">
 
         <div class="text-center text-gray-500 text-sm font-semibold py-2">
-          <span class="bg-purple-700 p-1"> {{ formatDate(date) }}</span>
+          <span class="text-purple-500"> {{ formatDate(date) }}</span>
         </div>
 
         <div 
           v-for="message in messages" 
           :key="message.id || message.timestamp" 
-          class="message"
         >
           <MessageChat
             :name="OwnerMessage(message.fromUserId)"

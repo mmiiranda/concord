@@ -71,36 +71,47 @@ const actions = {
         message?.content?.id ||
         message?.content?.timestamp ||
         new Date().getTime();
-
+    
       // Se já processamos esse ID, ignoramos
       if (state.processedEvents.has(eventId)) {
         console.log("⚠️ Evento duplicado ignorado:", eventId);
         return;
       }
       state.processedEvents.add(eventId);
-
+    
+      const user = rootGetters["getUser"];
+      const activeChat = rootGetters["chat/getActiveChat"];
+    
       // Mensagem de chat privado
       if (message.eventType === "USER_MESSAGE") {
-        const user = rootGetters["getUser"];
-        const activeChat = rootGetters["chat/getActiveChat"];
-
         const newMsg = {
           id: message.content.id || message.content.timestamp,
-          fromUserId: message.content.fromUserId, // Adicione isto!
+          fromUserId: message.content.fromUserId,
+          toUserId: message.content.toUserId,
           timestamp: message.content.timestamp || new Date().toISOString(),
           senderAvatar: message.content.senderAvatar || "no-photo.jpg",
           content: message.content.message,
         };
-        commit("ADD_MESSAGE", newMsg);
-
+    
+        
+        if (
+          activeChat &&
+          ((activeChat.type === "dm" &&
+            (activeChat.id === newMsg.fromUserId || activeChat.id === newMsg.toUserId)) ||
+            (activeChat.type === "server" && activeChat.id === message.content.serverId))
+        ) {
+          commit("ADD_MESSAGE", newMsg);
+        }
+    
         // Se a mensagem é para o usuário atual
         if (message.content.toUserId === user.id) {
           const fromUserId = message.content.fromUserId;
-
+    
           if (!activeChat || activeChat.id !== fromUserId || activeChat.type === "server") {
             const existingChat = state.unreadChats.find(
               (chat) => chat.fromUserId === fromUserId
             );
+    
             if (existingChat) {
               existingChat.unreadMessagesCount += 1;
             } else {
@@ -110,6 +121,7 @@ const actions = {
                 unreadMessagesCount: 1,
               });
             }
+    
             commit("SET_UNREAD_CHATS", [...state.unreadChats]);
           } else {
             console.log(`✅ Marcando mensagens de ${fromUserId} como lidas.`);
@@ -117,26 +129,27 @@ const actions = {
           }
         }
       }
-
+    
       // Solicitação de amizade
       else if (message.eventType === "FRIEND_REQUEST") {
         console.log("📤 Nova solicitação de amizade recebida!");
-        console.log(message.content)
-        if(message.content.status == "PENDING"){
+        console.log(message.content);
+    
+        if (message.content.status === "PENDING") {
           toast.info("You have a new friend request!", {
             autoClose: 3000,
             position: "top-right",
             theme: "dark",
           });
-          // eslint-disable-next-line
-        }else if(message.content.status = "ACCEPTED"){
-          dispatch("fetchFriends", null, { root: true })
+        } else if (message.content.status === "ACCEPTED") {
+          dispatch("fetchFriends", null, { root: true });
         }
+        
         dispatch("fetchPendingRequests", null, { root: true });
       }
-    });
+    })
   },
-
+    
   disconnectWebSocket({ commit }) {
     WebSocketService.disconnect();
     commit("SET_CONNECTED", false);

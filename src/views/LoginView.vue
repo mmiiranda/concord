@@ -1,6 +1,6 @@
 <template>
   <div class="bg-cleangray flex min-h-screen">
-    <div class="w-full xl:w-5/12 bg-darkblue text-white flex flex-col justify-center items-center lg:p-12 p-6">
+    <div class="w-full xl:w-5/12 bg-darkblue text-white flex flex-col justify-center items-center lg:p-12 p-6 animate-spawn">
       <LoginForm v-if="Isregister == 0"/>
       <RegisterForm @loading="toogleLoading" v-else/>
       <div class="text-white mt-6">

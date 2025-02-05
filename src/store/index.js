@@ -4,6 +4,7 @@ import websocket from "./websocket";
 import rightsidebar from "./rightsidebar";
 import mobile from "./mobile"
 import router from "@/router";
+import register from "./register";
 
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
@@ -30,12 +31,12 @@ export default createStore({
     isLoggedIn: (state) => !!state.token,
     getFirstAcess: (state) => state.firstAcess,
 
-    // Contador de solicitações de amizade pendentes
+    
     pendingRequestsCount: (state) => state.pendingRequestsCount,
-    // Lista completa de solicitações pendentes
+    
     getPendingRequests: (state) => state.pendingRequests,
 
-    // Amigos com mensagens pendentes (unread)
+    
     getFriendsWithPendingMessages: (state, getters, rootState, rootGetters) => {
       const unreadChats = rootGetters["websocket/unreadChats"];
       const activeChat = rootGetters["chat/getActiveChat"];
@@ -142,6 +143,7 @@ export default createStore({
           dispatch("fetchServers")
           dispatch("fetchPendingRequests");
           dispatch("websocket/connectWebSocket", token, { root: true });
+          dispatch("websocket/fetchUnreadChats", { root: true }); 
           return true;
     
         } catch (error) {
@@ -401,6 +403,7 @@ export default createStore({
     chat: chatModule,
     websocket,
     rightsidebar,
-    mobile
+    mobile,
+    register
   },
 });

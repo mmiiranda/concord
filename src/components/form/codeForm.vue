@@ -23,6 +23,7 @@ import CodeInput from "../input/codeInput.vue";
       },
       methods: {
         ...mapActions(["setFirstAcess", "login"]),
+        ...mapActions("register", ["setUser"]),
         handleCodeInput(value) {
           this.codeValue.code = value; 
     
@@ -48,6 +49,7 @@ import CodeInput from "../input/codeInput.vue";
                   localStorage.setItem("UserSetting", JSON.stringify(responseData.user));
 
                   this.setFirstAcess(true)
+                  this.setUser(null)
                   this.login();
                   this.$router.push("/");
               } else {

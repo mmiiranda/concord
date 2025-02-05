@@ -20,7 +20,9 @@ const state = {
     },
     closeSidebar({ commit }) {
       commit('SET_IS_OPEN', false);
-      commit('SET_SELECTED_FRIEND', null);
+      setTimeout(()=>{
+        commit('SET_SELECTED_FRIEND', null);
+      }, 500)
     }
   };
   

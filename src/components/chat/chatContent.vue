@@ -10,18 +10,21 @@
       <div v-for="(messages, date) in groupedMessages" :key="date">
 
         <div class="text-center text-gray-500 text-sm font-semibold py-2">
-          <span class="text-purple-500"> {{ formatDate(date) }}</span>
+          <span class="text-purple"> {{ formatDate(date) }}</span>
         </div>
 
         <div 
-          v-for="message in messages" 
-          :key="message.id || message.timestamp" 
+          v-for="(message, index) in messages" 
+          :key="message.id || message.timestamp"
         >
           <MessageChat
             :name="OwnerMessage(message.fromUserId)"
             :msgTimestamp="message.timestamp"
             :src="getImageOwner(message.fromUserId) || 'no-photo.jpg'"
             :message="message.content"
+
+            
+            :showHeader="shouldShowHeader(index, messages)"
           />
         </div>
       </div>
@@ -92,6 +95,16 @@ export default {
 
     getImage(imagePath){
         return imagePath ? `${process.env.VUE_APP_API_URL}/api/files/images?file-id=${imagePath}`: 'no-photo.jpg';
+    },
+
+    shouldShowHeader(index, messages) {
+      // Se for a 1ª mensagem do array, mostra cabeçalho
+      if (index === 0) return true;
+
+      // Se o autor atual for diferente do autor anterior, mostra cabeçalho
+      const atual = messages[index];
+      const anterior = messages[index - 1];
+      return atual.fromUserId !== anterior.fromUserId;
     },
 
     sendMessageHandler(messageContent) {

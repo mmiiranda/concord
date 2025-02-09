@@ -16,12 +16,15 @@
                     </div>
                     <div>
                         <div class="flex flex-col justify-center items-center">
-                            <FileAlt 
-                                name="firstAccessImage"
-                                accept=".jpg, .png, .jpeg"
-                                @imageUploaded="changeImages"
-                            />
-                            <p class="text-sm opacity-80">Choose a photo for your profile</p>
+                            <div class="flex flex-col justify-center items-center" v-if="!isSubmited">
+                                <FileAlt 
+                                    name="firstAccessImage"
+                                    accept=".jpg, .png, .jpeg"
+                                    @imageUploaded="changeImages"
+                                />
+                                <p class="text-sm opacity-80">Choose a photo for your profile</p>
+                            </div>
+                            <LoadingComp v-else />
                         </div>
                     </div>
                 </div>
@@ -54,19 +57,22 @@ import { mapActions } from 'vuex';
 import ButtonAlt from '../input/buttonAlt.vue';
 import FileAlt from '../input/fileAlt.vue';
 import ModalOverlay from '../modal/modalOverlay.vue';
+import LoadingComp from '../load/loadingComp.vue';
 
     export default {
         name: "firstAcessModal",
         data(){
             return{
                 selectedImage: "",
-                selectedFile: null
+                selectedFile: null,
+                isSubmited: false,
             }
         },
         components:{
             ModalOverlay,
             FileAlt,
-            ButtonAlt
+            ButtonAlt,
+            LoadingComp
         },
         methods:{
             ...mapActions(["setFirstAcess", "updateUserImage"]),
@@ -120,6 +126,7 @@ import ModalOverlay from '../modal/modalOverlay.vue';
                     return;
                 }
 
+                this.isSubmited = true,
                 console.log("📤 Fazendo upload da nova imagem...");
                 const tempPath = await this.uploadFile(this.selectedFile);
                 console.log("🚀 Caminho da imagem após upload:", tempPath);
@@ -132,7 +139,7 @@ import ModalOverlay from '../modal/modalOverlay.vue';
                 console.log("✅ Upload bem-sucedido, atualizando usuário...");
                 console.log(tempPath.fileId)
                 await this.updateUserImage(tempPath.fileId);
-
+                this.isSubmited = false
                 this.setFirstAcess(false)
             },
         }

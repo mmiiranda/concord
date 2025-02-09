@@ -135,13 +135,15 @@ const actions = {
         console.log("📤 Nova solicitação de amizade recebida!");
         console.log(message.content);
     
-        if (message.content.status === "PENDING") {
+        if (message.content.status === "PENDING" && (message.content.toUserId != user.id)) {
           toast.info("You have a new friend request!", {
             autoClose: 3000,
             position: "top-right",
             theme: "dark",
           });
         } else if (message.content.status === "ACCEPTED") {
+          dispatch("fetchFriends", null, { root: true });
+        }else if(message.content.status === "REMOVED"){
           dispatch("fetchFriends", null, { root: true });
         }
         

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-[calc(100dvh-5rem)] bg-[#272727] fixed z-50 md:relative  md:flex" ref="sidebar">
+  <div class="flex h-[calc(100dvh-5rem)] bg-dark-gray-1 fixed z-40 md:relative  md:flex" ref="sidebar">
     <div class="flex flex-col items-center py-6 px-1">
       <div class="flex flex-col items-center  gap-1">
 
@@ -34,7 +34,7 @@
           </div>
         </div>
 
-        <div class="w-4/5 bg-hovergray h-[3px] mt-2"></div>
+        <div class="w-4/5 bg-medium-gray h-[3px] mt-2"></div>
         
         <div class="flex flex-col gap-3">
           <MiniServerIcon
@@ -140,7 +140,6 @@ export default {
     // Função para abrir o chat com um amigo
    
     async openChat(friend) {
-      console.log(`📤 Abrindo chat com amigo ID: ${friend.id}`);
       
       // 1) Seta o chat ativo direto no Vuex
       this.setActiveChat({
@@ -152,7 +151,6 @@ export default {
 
       // 2) Chama a action para marcar como lidas
       await this.markMessagesAsRead({ fromUserId: friend.id });
-      console.log(`✅ Mensagens de ${friend.id} marcadas como lidas.`);
 
       // 3) (Opcional) Emitir para o pai, se lineainda precisar
       this.closeSidebar()
@@ -188,7 +186,6 @@ export default {
     },
 
     handleClickOutsideSideBar(event){
-      console.log("mobile", this["isMobile,isSidebarOpen"])
       if(this.$refs.sidebar && !this.$refs.sidebar.contains(event.target) && this.isMobile && this.isSidebarOpen){
         this.checkController()
         this.mobileMenuAux = !this.mobileMenuAux

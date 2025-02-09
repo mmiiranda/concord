@@ -7,7 +7,7 @@
           <li
             v-for="friend in friendsList"
             :key="friend.id"
-            class="cursor-pointer px-4 py-2 hover:bg-gray/10"
+            class="cursor-pointer px-4 py-2 hover:bg-white/20"
             @click="openDm(friend)"
           >
             <MiniFriendProfile :name="friend.username" :src="friend.imagePath" />

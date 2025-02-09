@@ -14,9 +14,17 @@ const state = {
   };
   
   const actions = {
-    openSidebarWithFriend({ commit }, friend) {
-      commit('SET_SELECTED_FRIEND', friend);
-      commit('SET_IS_OPEN', true);
+    openSidebarWithFriend({ commit,state }, friend) {      
+      if(!state.isOpen){
+        commit('SET_SELECTED_FRIEND', friend);
+        commit('SET_IS_OPEN', true);
+      }else{
+        commit('SET_IS_OPEN', false);
+        setTimeout(()=>{
+          commit('SET_IS_OPEN', true);
+          commit('SET_SELECTED_FRIEND', friend);
+        }, 300)
+      }
     },
     closeSidebar({ commit }) {
       commit('SET_IS_OPEN', false);
@@ -38,4 +46,3 @@ const state = {
     actions,
     getters
   };
-  

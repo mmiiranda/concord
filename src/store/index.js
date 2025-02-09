@@ -5,6 +5,7 @@ import rightsidebar from "./rightsidebar";
 import mobile from "./mobile"
 import router from "@/router";
 import register from "./register";
+import modalForgetPassword from "./modalForgetPassword";
 
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
@@ -30,6 +31,7 @@ export default createStore({
     getServers: (state) => state.serversList,
     isLoggedIn: (state) => !!state.token,
     getFirstAcess: (state) => state.firstAcess,
+    getModalForgetPassword: (state) => state.ModalForgetPassword,
 
     
     pendingRequestsCount: (state) => state.pendingRequestsCount,
@@ -95,6 +97,10 @@ export default createStore({
   actions: {
     setFirstAcess({commit}, value){
       commit("SET_FIRST_ACESS", value);
+    },
+
+    setModalForgetPassword({commit}, value){
+      commit("SET_MODALFORGETPASSWORD", value);
     },
 
     toogleLoading({ commit }) {
@@ -235,7 +241,13 @@ export default createStore({
           });
         } else {
           const errorData = await response.json();
-          console.error(`Erro ao atualizar ${field}:`, errorData);
+          console.error(`Erro ao atualizar ${field}:`, errorData.message);
+
+          toast.error(`${errorData.message}. `, {
+            autoClose: 1000,
+            position: "top-right",
+            theme: "dark",
+          });
         }
       } catch (err) {
         console.error(`Erro na requisição para atualizar ${field}:`, err);
@@ -404,6 +416,7 @@ export default createStore({
     websocket,
     rightsidebar,
     mobile,
-    register
+    register,
+    modalForgetPassword
   },
 });

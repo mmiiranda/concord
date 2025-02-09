@@ -1,20 +1,29 @@
 <template>
-    <div class="flex gap-4">
-
-        <div class="w-10 h-10 rounded-full overflow-hidden mt-2">
-            <img :src="src" class="w-full h-full object-cover"/>
-        </div>
-
-        
-        <div class="w-auto">
-            <h4 class="font-bold text-xl"> {{ name }} </h4>
-            <h5 class="text-gray text-sm font-bold -mt-1"> {{ formattedDate }}, {{ formattedHour }} </h5>
-
+    <div class="flex flex-col">
+        <!-- Só exibe avatar se showHeader === true -->
+        <div class="flex gap-4 ">
+            <div v-if="showHeader" class="w-10 h-10 rounded-full overflow-hidden mt-2">
+                <img :src="src" class="w-full h-full object-cover"/>
+            </div>
             <div>
-                <p> {{ message }} </p>
+                <div>
+                    <h4 v-if="showHeader" class="font-bold text-xl">{{ name }}</h4>
+                    <h5 v-if="showHeader" class="text-white/60 text-sm font-bold -mt-1">
+                        {{ formattedDate }}, {{ formattedHour }}
+                    </h5>
+                </div>
             </div>
         </div>
-    </div>
+
+        <div>
+          <!-- Só exibe nome + data/hora se showHeader === true -->
+          
+    
+          <div>
+            <p>{{ message }}</p>
+          </div>
+        </div>
+      </div>
 </template>
 
 <script>
@@ -36,6 +45,10 @@ export default {
         message: {
             type: String,
             required: true
+        },
+        showHeader: {
+            type: Boolean,
+            default: true,
         }
     },
     computed: {

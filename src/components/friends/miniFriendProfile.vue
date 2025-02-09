@@ -2,7 +2,7 @@
     <div :class="['flex items-center gap-3   cursor-pointer  transition-all ease-in'
         , newMessage ? 'opacity-100' : 'opacity-80']">
         <div class="w-7 h-7 rounded-full
-        grid place-items-center overflow-hidden bg-darkblue">
+         overflow-hidden bg-darkblue">
             <img 
             class="w-full h-full object-cover"
             :src="getImage(src)">

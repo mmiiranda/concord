@@ -1,5 +1,5 @@
 <template>
-    <div class="mt-4">
+    <div class="mt-4 min-h-[calc(100dvh-5rem)] overflow-y-auto">
         <h3 class="font-bold text-2xl mt-2">Profile</h3>
         <div class="px-1 md:px-12 max-w-screen-md mx-auto">
             <div class="bg-darkblue rounded-md flex flex-col md:flex-row justify-around gap-5 py-6 px-8 mt-4">
@@ -46,7 +46,7 @@
                     <span class="text-base font-bold">
                         *After deleting the account, you will not have access to your messages
                     </span>
-                    <div class="w-48 text-lg">
+                    <div class="w-48 text-lg mt-2">
                         <ButtonAlt type="button" value="Delete account" class="bg-red" @click="missing" />
                     </div>
                 </div>

@@ -1,11 +1,12 @@
 <template>
   <div
     :class="[
-      'fixed top-0 right-0 h-[calc(100dvh-5rem)] py-12 px-8 flex flex-col bg-[#272727] text-white transition-all ease-in',
+      'fixed top-0 w-full md:w-auto right-0 h-[calc(100dvh-5rem)] z-40  py-12 px-8 flex flex-col bg-[#272727] text-white transition-all ease-in',
       isOpen ? 'translate-x-0' : 'translate-x-full'
     ]"
     @click.stop
     @click.self="toggleBar"
+    ref="rightSidebar"
   >
     <FriendProfile
       v-if="selectedFriend"
@@ -45,6 +46,11 @@ import { mapGetters, mapActions } from "vuex";
 
 export default {
   name: "RightSidebar",
+  data(){
+    return{
+      openBarAux: false,
+    }
+  },
   computed: {
     ...mapGetters("rightsidebar", ["isOpen", "selectedFriend"]),
     ...mapGetters(["getToken", "getUser"]),
@@ -76,7 +82,10 @@ export default {
     getImage(imagePath){
         console.log(imagePath)
         return imagePath ? `${process.env.VUE_APP_API_URL}/api/files/images?file-id=${imagePath}`: 'no-photo.jpg';
-      },
+    },
+    checkController(){
+      if(this.openBarAux) this.closeSidebar()
+    },
   },
   components: {
     FriendProfile,

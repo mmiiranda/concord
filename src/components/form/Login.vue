@@ -25,20 +25,18 @@
                 />
             </div>
             <div class="text-right">
-                <a href="#" class="text-blue" @click="toggleForgetModal">
+                <a href="#" class="text-blue" @click="setModalState(true)">
                     Forgot your password?
                 </a>
             </div>
             <buttonAlt type="submit" value="Log In" class="mt-6" />
         </form>
-        <EmailForForgetPassword @close="toggleForgetModal" v-show="ForgetModalOpen" />
     </div>
 </template>
 
 <script>
 import inputAlt from "@/components/input/inputAlt.vue";
 import buttonAlt from "@/components/input/buttonAlt.vue";
-import EmailForForgetPassword from "./EmailForForgetPassword.vue";
 import { mapActions } from "vuex";
 
 export default {
@@ -46,18 +44,10 @@ export default {
     components: {
         inputAlt,
         buttonAlt,
-        EmailForForgetPassword
-    },
-    data() {
-        return {
-            ForgetModalOpen: false
-        };
     },
     methods: {
         ...mapActions(["toogleLoading", "login"]),
-        toggleForgetModal() {
-            this.ForgetModalOpen = !this.ForgetModalOpen;
-        },
+        ...mapActions("modalForgetPassword", ["setModalState"]),
         handleSubmit(event) {
             const form = event.target.closest("form");
             
@@ -65,7 +55,7 @@ export default {
                 const inputs = form.querySelectorAll("input, select, textarea");
                 inputs.forEach(input => {
                     if (!input.validity.valid) {
-                        this.$toast(`Error in the field "${input.id}": ${input.validationMessage}`, "error");
+                        this.$toast(`Error in the field "${input.id}"`, "error");
                     }
                 });
             } else {

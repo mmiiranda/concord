@@ -1,6 +1,6 @@
 <template>
     <div class="text-white flex flex-col w-full animate-spawn">
-        <div class="flex justify-center md:justify-start border-2 border-darkblue/80 w-full px-1 lg:px-8 py-2">
+        <div class="flex justify-center md:justify-start border-b-2 border-darkblue/80 w-full px-1 lg:px-8 py-2">
             <div class="flex gap-2 md:border-r-2 md:border-gray md:pr-4">
                 <img src="../icon/people.svg" class="hidden md:block" alt="Icone de Pessoas">
                 <h4 class="font-bold hidden md:block">Friends</h4>
@@ -56,18 +56,18 @@
                 <SearchBar id="searchAllFriend" name="searchAllFriend" placeholder="Search"
                            v-model="searchQuery" />
                 <h3 class="font-bold text-sm mt-5">FRIENDS - {{ filteredAllFriends.length }}</h3>
-                <div class="flex flex-col w-full mt-4">
+                <div class="flex flex-col w-full mt-4 h-[calc(90vh-200px)]  overflow-y-auto"> <!-- Adicione flex-grow e overflow-y-auto -->
                     <FriendsForChat
-                        class="animate-spawn"
-                        v-for="friend in filteredAllFriends"
-                        :key="friend.id"
-                        :name="friend.name"
-                        :username="friend.username"
-                        :is-online="friend.isOnline"
-                        :src="friend.imagePath"
-                        :obj="friend"
-                    />
-                </div>
+                      v-for="friend in filteredAllFriends"
+                      :key="friend.id"
+                      :name="friend.name"
+                      :username="friend.username"
+                      :is-online="friend.isOnline"
+                      :src="friend.imagePath"
+                      :obj="friend"
+                      class="animate-spawn"
+                    />  
+                  </div>
             </div>
             <div v-if="option == 3">
                 <SearchBar id="searchFriend" name="searchFriend" placeholder="Search"
@@ -84,6 +84,7 @@
                       :destination="friendship.friend.id"
                       :src="friendship.friend.imagePath"
                       @submited="reset"
+                      class="animate-spawn"
                   />
                 </div>
               </div>
@@ -94,7 +95,7 @@
                     <SearchBar id="searchFriend" name="searchFriend"
                                v-model="newFriend" placeholder="Search" />
                     <div>
-                        <ButtonAlt type="submit" value="Add" class="bg-green" />
+                        <ButtonAlt type="submit" value="Add"  />
                     </div>
                 </form>
             </div>

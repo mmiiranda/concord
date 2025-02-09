@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isLoggedIn" class="bg-cleangray h-[calc(100dvh-5rem)] flex overflow-hidden relative" ref="screen">
+  <div v-if="isLoggedIn" class="bg-gray h-[calc(100dvh-5rem)] flex overflow-hidden relative" ref="screen">
     <div v-if="isSidebarOpen" class="relative">
       <sideBar />
     </div>
@@ -17,7 +17,7 @@
       <RightSideBar />
     </div>
     <FirstAcessModal v-show="getFirstAcess"/>
-    <footerConfig class="z-50" />
+    <footerConfig class="z-40" />
   </div>
 
 </template>

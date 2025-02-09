@@ -1,25 +1,30 @@
 <template>
     <ModalOverlay>
         <div class="bg-darkblue p-4 rounded min-w-80">
-            <div class="flex justify-between items-center">
-                <h2 class="text-xl font-bold">
-                    Change Profile Picture
-                </h2>
-                <div>
-                    <a href="#" @click="emitClose">X</a>
+            <div v-if="!isSubmited">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-bold">
+                        Change Profile Picture
+                    </h2>
+                    <div>
+                        <a href="#" @click="emitClose">X</a>
+                    </div>
                 </div>
+                <form class="flex flex-col items-center mt-4 gap-6" @submit.prevent="submitForm">
+                    <FileAlt 
+                        name="confirm-ft"
+                        accept=".jpg, .png, .jpeg"
+                        :placeholder-image="img"
+                        @imageUploaded="changeImg"
+                    />
+                    <div class="w-full">
+                        <ButtonAlt type="submit" value="Confirm" />
+                    </div>
+                </form>
             </div>
-            <form class="flex flex-col items-center mt-4 gap-6" @submit.prevent="submitForm">
-                <FileAlt 
-                    name="confirm-ft"
-                    accept=".jpg, .png, .jpeg"
-                    :placeholder-image="img"
-                    @imageUploaded="changeImg"
-                />
-                <div class="w-full">
-                    <ButtonAlt type="submit" value="Confirm" />
-                </div>
-            </form>
+            <div class="grid place-items-center" v-else>
+                <LoadingComp />
+            </div>
         </div>
     </ModalOverlay>
 </template>
@@ -29,6 +34,7 @@ import { mapActions } from 'vuex';
 import ButtonAlt from '../input/buttonAlt.vue';
 import FileAlt from '../input/fileAlt.vue';
 import ModalOverlay from '../modal/modalOverlay.vue';
+import LoadingComp from '../load/loadingComp.vue';
 
 export default {
     name: "UpdateUserPhoto",
@@ -45,7 +51,8 @@ export default {
     data() {
         return {
             img: this.imagePath || "no-photo.jpg",
-            fileToUpload: this.selectedFile // Variável interna para armazenar o arquivo
+            fileToUpload: this.selectedFile,// Variável interna para armazenar o arquivo
+            isSubmited: false,
         };
     },
     watch: {
@@ -59,7 +66,8 @@ export default {
     components: {
         ModalOverlay,
         FileAlt,
-        ButtonAlt
+        ButtonAlt,
+        LoadingComp
     },
     methods: {
         ...mapActions(["updateUserImage"]),
@@ -84,10 +92,11 @@ export default {
                 return;
             }
 
+            this.isSubmited = true
             console.log("📤 Fazendo upload da nova imagem...");
             const tempPath = await this.uploadFile(this.fileToUpload);
             console.log("🚀 Caminho da imagem após upload:", tempPath);
-
+            
             if (!tempPath) {
                 console.error("❌ Erro ao fazer upload da imagem.");
                 return;
@@ -98,6 +107,7 @@ export default {
             await this.updateUserImage(tempPath.fileId);
 
             this.emitClose();
+            this.isSubmited = false
         },
 
         async uploadFile(file) {

@@ -3,7 +3,7 @@
         <div class="flex flex-col gap-3">
             <InputAlt 
                 id="newPassword"
-                name="Nova Senha"
+                name="New Password"
                 placeholder="New Password"
                 type="password"
                 required
@@ -11,7 +11,7 @@
             />
             <InputAlt 
                 id="confirmNewPassword"
-                name="Confirmar Nova Senha"
+                name="Confirm New Password"
                 placeholder="Confirm New Password"
                 type="password"
                 required

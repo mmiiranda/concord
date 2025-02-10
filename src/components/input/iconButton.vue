@@ -1,33 +1,33 @@
 <template>
-    <input 
-    :id="name"
-    :name="name" 
-    :type="type" hidden>
-    <label :for="name"
-    class="bg-white hover:bg-zinc-400 px-2 py-1 h-10 w-11 transition-all text-black font-bold outline-none rounded-lg shadow">
+    <button 
+        :id="name" 
+        :name="name" 
+        :type="type" 
+        class="text-white grid place-items-center hover:bg-zinc-400 px-1 py-1 h-10 w-11 transition-all font-bold outline-none rounded-lg shadow"
+    >
         <img 
-        :src="src"  
-        class="w-full h-full object-cover"    
+            :src="src"  
+            class="size-4/5 object-cover"    
         />
-    </label>
+    </button>
 </template>
 
 <script>
-    export default {
-        name: "iconButton",
-        props: {
-            src: {
-                type: String,
-                required: true
-            },
-            name: {
-                type: String,
-                required: true
-            },
-            type:{
-                type: String,
-                required: true
-            }
+export default {
+    name: "IconButton",
+    props: {
+        src: {
+            type: String,
+            required: true
+        },
+        name: {
+            type: String,
+            required: true
+        },
+        type: {
+            type: String,
+            default: 'button'
         }
     }
+}
 </script>

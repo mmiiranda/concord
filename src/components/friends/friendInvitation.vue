@@ -1,11 +1,10 @@
 <template>
     <div class="friend-chat-row border-b-2 py-3 border-[#808080]/70 flex w-full justify-between items-center
     hover:bg-gray/20 px-2 transition-all ease-in">
-         <div class="flex items-center gap-2">
+         <div class="flex items-center gap-2 cursor-pointer">
             <div class=" bg-darkblue
             flex h-9 w-9 relative rounded-full justify-center items-center">
-                   <span> {{ name[0].toUpperCase() }} </span>
-                   <img :src="src" class="w-full h-full" v-show="src != null">
+                   <img :src="getImage(src)" class="w-full h-full rounded-full">
                </div>
              <div class="flex flex-col justify-center">
                  <div>
@@ -23,7 +22,7 @@
             <button class="rounded-full bg-darkblue w-6 h-6 grid place-items-center
             cursor-pointer"
             v-show="origin != getUser.id"
-            data-value="ACCEPTED"
+            data-value="accept"
             type="submit"
             >
                 <img 
@@ -34,7 +33,7 @@
             </button>
             <button class="rounded-full bg-darkblue w-6 h-6 grid place-items-center
             cursor-pointer"
-            data-value="DENIED"
+            :data-value="origin != getUser.id ? 'deny' : 'cancel'"
             type="submit"
             >
                 <img src="../icon/close.svg" 
@@ -80,32 +79,24 @@ import { mapGetters } from 'vuex';
             ...mapGetters(["getUser", "getToken"])
          },
          methods: {
-            a(){
-                console.log(this.getUser.id)
-                console.log(this.origin)
+            getImage(imagePath){
+                return imagePath ? `${process.env.VUE_APP_API_URL}/api/files/images?file-id=${imagePath}`: 'no-photo.jpg';
             },
             async submitRequest(event){
                 try{
                     const value = event.submitter.getAttribute("data-value");   
 
-                    const requestBody = {
-                                id: this.id,
-                                status: value
-                        }
-
-                    const response = await fetch(`http://localhost:8080/api/friendships/${this.id}`,{
-                            method: 'PUT',
+                    const response = await fetch(`${process.env.VUE_APP_API_URL}/api/friendships/${this.id}/${value}`,{
+                            method: 'PATCH',
                             headers: {
                             "Content-Type": "application/json",
                             "Authorization": `Bearer ${this.getToken}`
-                            },
-                            body: JSON.stringify(requestBody)
+                            }
                         }
                     )  
 
                     this.$emit("submited")
 
-                    console.log(requestBody)
                     console.log(response)
                     
                 }catch(err){    

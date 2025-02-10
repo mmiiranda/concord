@@ -14,7 +14,11 @@ module.exports = {
       ping: 'ping 1s cubic-bezier(0, 0, 0.2, 1) infinite',
       pulse: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
       bounce: 'bounce 1s infinite',
-      spawn: "spawn .3s forwards"
+      spawn: "spawn .3s forwards",
+      slideright: 'slideright ease-in .2s ',
+      slideleft: 'slideleft ease-in .2s ',
+      slideup: 'slideup ease-in .2s ',
+      slidedown: 'slidedown ease-in .2s ',
     },
     aria: {
       busy: 'busy="true"',
@@ -141,9 +145,10 @@ module.exports = {
       slate: colors.slate,
       cleangray: "#434343",
       darkgray: "#328ED0",
-      gray: "#D9D9D9",
-      deadGray: "#283242",
-      hovergray: "#273B4A",
+      gray: "#434343",
+      'dark-gray-1': "#272727",
+      'dark-gray-2': "#202020",
+      'medium-gray': "#363636",
       darkblue: "#202020",
       zinc: colors.zinc,
       neutral: colors.neutral,
@@ -161,7 +166,8 @@ module.exports = {
       blue: "#328ED0",
       indigo: colors.indigo,
       violet: colors.violet,
-      purple: colors.purple,
+      purple: "#9333ea",
+      'light-purple': "#a855f7",  
       darkpurple: "#090814",
       fuchsia: colors.fuchsia,
       pink: colors.pink,
@@ -611,7 +617,45 @@ module.exports = {
           transform: 'translateY(0)',
           opacity: "1" 
         }
-      }
+      },
+      slideright:{
+        '0%':{
+          transform: 'translateX(-100%)',
+          opacity: "0"
+        },
+        '100%':{
+          transform: 'translateX(0)',
+          opacity: "1"
+        },
+      },
+      slideleft:{
+        '0%':{
+          transform: 'translateX(100%)',
+          opacity: "0"
+        },
+        '100%':{
+          transform: 'translateX(0)',
+          opacity: "1"
+        },
+      },
+      slideup:{
+        '0%':{
+          transform: 'translateY(calc(100dvh-5rem))',
+        },
+        '100%':{
+          transform: 'translateY(0)',
+        },
+      },
+      slidedown:{
+        '0%':{
+          transform: 'translateY(-100%)',
+          opacity: "0"
+        },
+        '100%':{
+          transform: 'translateY(0)',
+          opacity: "1"
+        },
+      },
     },
     letterSpacing: {
       tighter: '-0.05em',
@@ -1079,4 +1123,3 @@ module.exports = {
   },
   plugins: [],
 }
-

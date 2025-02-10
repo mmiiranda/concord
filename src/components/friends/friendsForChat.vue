@@ -1,63 +1,98 @@
-    <template>
-    <div class="friend-chat-row border-b-2 py-3 border-[#808080] flex w-full justify-between items-center
+<template>
+    <div class="friend-chat-row border-b-2 py-3 border-[#383838] flex w-full justify-between items-center
     hover:bg-gray/20 px-2 transition-all ease-in">
-            <div class="flex items-center gap-2">
-                <div class=" bg-darkblue
-             flex h-9 w-9 relative rounded-full justify-center items-center">
-                    <span> {{ name[0].toUpperCase() }} </span>
-                    <img :src="src" class="w-full h-full" v-show="src != null">
-                    <div :class="['w-3 h-3 absolute bottom-0 right-0 rounded-full',
-                    isOnline ? 'bg-[#00C417]': 'bg-red']"></div>
-                </div>
-                <div class="flex flex-col justify-center">
-                    <div>
-                        <h4 class="font-bold text-sm"> {{ name }} </h4>
-                    </div>
-                    <div>
-                        <h5 class="text-[12px] text-gray -mt-1"> @{{ username }} </h5>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="rounded-full bg-darkblue w-6 h-6 grid place-items-center
-            cursor-pointer">
-                <img src="../icon/Subtract.svg" 
-                class="object-cover size-3"
-                alt="chat icon">
-            </div>
+      <div class="flex items-center gap-2 cursor-pointer">
+        <div class="bg-darkblue flex h-9 w-9 relative rounded-full justify-center items-center">
+          <img :src="getImage(src)" class="w-full h-full rounded-full" alt="Avatar">
+          <div :class="['w-3 h-3 absolute bottom-0 right-0 rounded-full',
+            isOnline ? 'bg-[#00C417]' : 'bg-red']"></div>
+        </div>
+        <div class="flex flex-col justify-center" @click="selectFriend">
+          <div>
+            <h4 class="font-bold text-sm"> {{ name }} </h4>
+          </div>
+          <div>
+            <h5 class="text-[12px] text-gray -mt-1"> @{{ username }} </h5>
+          </div>
+        </div>
+      </div>
+      
+      <div class="rounded-full bg-darkblue w-6 h-6 grid place-items-center
+      cursor-pointer"
+      @click="openChat(obj)">
+          <img src="../icon/Subtract.svg" 
+          class="object-cover size-3"
+          alt="chat icon">
+      </div>
     </div>
-    </template>
-
-    <script>
-        export default {
-            name: "friendsForChat",
-            props: {
-                src: {
-                    type: String,
-                    required: true,
-                },
-                name: {
-                    type: String,
-                    required: true,
-                },
-                username: {
-                    type: String,
-                    required: true,
-                },
-                isOnline: {
-                    type: Boolean,
-                    required: true,
-                },
-                chatId: {
-                    type: String,
-                    required: true,
-                }
-            }   
+  </template>
+  
+  <script>
+  import { mapActions } from 'vuex';
+  
+  export default {
+    name: "friendsForChat",
+    props: {
+      src: {
+        type: String,
+        required: false, // Alterado para false, pois pode não ter imagem
+        default: null
+      },
+      name: {
+        type: String,
+        required: true,
+      },
+      username: {
+        type: String,
+        required: true,
+      },
+      isOnline: {
+        type: Boolean,
+        required: true,
+      },
+      obj: { 
+        type: Object,
+        required: true,
+      }
+    },
+    methods: {
+      ...mapActions("chat", ["setActiveChat"]), 
+      ...mapActions('rightsidebar', ['openSidebarWithFriend']),
+      ...mapActions("websocket",["markMessagesAsRead"]),
+      getImage(imagePath){
+          return imagePath ? `${process.env.VUE_APP_API_URL}/api/files/images?file-id=${imagePath}`: 'no-photo.jpg';
+      },
+      async openChat(friend) {
+        if (this.activeChat && this.activeChat.id === friend.id && this.activeChat.type === "dm") {
+          return;
         }
-    </script>
 
-    <style>
-    .friend-chat-row:last-child{
-        border: none;
+        this.setActiveChat({
+          id: friend.id,
+          name: friend.username, 
+          type: "dm" ,
+          imagePath: friend.imagePath
+        });
+
+        await this.markMessagesAsRead({ fromUserId: friend.id });
+        console.log(`✅ Mensagens de ${friend.id} marcadas como lidas.`);
+      },
+      selectFriend() {
+        console.log(this.obj)
+        this.openSidebarWithFriend(this.obj);
+      },
     }
-    </style>
+  }
+  </script>
+  
+  <style scoped>
+  .friend-chat-row:last-child{
+    border: none;
+  }
+  .avatar {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+  }
+  </style>
+  

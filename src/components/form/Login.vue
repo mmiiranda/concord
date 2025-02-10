@@ -2,7 +2,7 @@
     <div class="flex flex-col text-white gap-12 w-full">
         <div class="grid place-items-center">
             <img src="logo.svg" alt="Concord Logo">
-            <h1 class="font-bold text-3xl text-center">Bem Vindo ao Concord</h1>
+            <h1 class="font-bold text-3xl text-center">Welcome to <span class="text-purple-600">Concord</span></h1>
         </div>
         <form @submit.prevent="handleSubmit" novalidate>
             <div class="flex flex-col gap-2">
@@ -11,7 +11,7 @@
                     type="text"
                     name="email"
                     id="Email"
-                    placeholder="Digite seu Email"
+                    placeholder="Enter your email"
                     required
                 />
                 <inputAlt
@@ -19,26 +19,24 @@
                     type="password"
                     name="password"
                     id="Senha"
-                    placeholder="Digite sua senha"
+                    placeholder="Enter your password"
                     required
                     minlength="8"
                 />
             </div>
             <div class="text-right">
-                <a href="#" class="text-blue" @click="toggleForgetModal">
-                    Esqueceu a Senha?
+                <a href="#" class="text-blue" @click="setModalState(true)">
+                    Forgot your password?
                 </a>
             </div>
             <buttonAlt type="submit" value="Log In" class="mt-6" />
         </form>
-        <EmailForForgetPassword @close="toggleForgetModal" v-show="ForgetModalOpen" />
     </div>
 </template>
 
 <script>
 import inputAlt from "@/components/input/inputAlt.vue";
 import buttonAlt from "@/components/input/buttonAlt.vue";
-import EmailForForgetPassword from "./EmailForForgetPassword.vue";
 import { mapActions } from "vuex";
 
 export default {
@@ -46,18 +44,10 @@ export default {
     components: {
         inputAlt,
         buttonAlt,
-        EmailForForgetPassword
-    },
-    data() {
-        return {
-            ForgetModalOpen: false
-        };
     },
     methods: {
         ...mapActions(["toogleLoading", "login"]),
-        toggleForgetModal() {
-            this.ForgetModalOpen = !this.ForgetModalOpen;
-        },
+        ...mapActions("modalForgetPassword", ["setModalState"]),
         handleSubmit(event) {
             const form = event.target.closest("form");
             
@@ -65,7 +55,7 @@ export default {
                 const inputs = form.querySelectorAll("input, select, textarea");
                 inputs.forEach(input => {
                     if (!input.validity.valid) {
-                        this.$toast(`Erro no campo "${input.id}": ${input.validationMessage}`, "error");
+                        this.$toast(`Error in the field "${input.id}"`, "error");
                     }
                 });
             } else {
@@ -76,12 +66,10 @@ export default {
             const form = document.querySelector("form");
             const data = new FormData(form);
             const json = Object.fromEntries(data.entries());
-
-            console.log(json);
-            this.toogleLoading();
             
+            this.toogleLoading();
             try {
-                const response = await fetch("http://localhost:8080/api/auth/login", {
+                const response = await fetch(`${process.env.VUE_APP_API_URL}/api/auth/login`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(json)
@@ -98,11 +86,11 @@ export default {
                     this.$router.push("/");
                 } else {
                     console.log("Erro ao fazer login", response);
-                    this.$toast("Usuário ou senha incorretos", "error");
+                    this.$toast("Incorrect username or password", "error");
                 }   
             } catch (err) {
                 console.error("Erro na requisição:", err);
-                this.$toast("Houve um problema ao realizar o login", "error");
+                this.$toast("There was a problem logging in", "error");
             } finally {
                 this.toogleLoading();
             }

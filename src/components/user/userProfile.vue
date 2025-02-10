@@ -1,61 +1,40 @@
+
 <template>
-    <div class="flex gap-1">
-        <div class="flex items-center">
+    <div class="flex gap-2">
+        <div class="flex items-center w-12 h-12 overflow-hidden rounded-full">
             <img 
-                :src="getProfileImage()" 
+                :src="getImage(getUser.imagePath)" 
                 alt="User Profile"
-                class="w-12 h-12 rounded-full"
+                class="size-full object-cover"
             />
         </div>
         <div class="flex flex-col justify-center">
-            <h2 class="text-lg font-bold">{{ user.name }}</h2>
-            <p class="text-sm text-gray-300">{{ user.username }}</p>
+            <h2 class="text-lg font-bold">{{ getUser.name }}</h2>
+            <p class="text-sm text-gray-300">{{ getUser.username }}</p>
         </div>
     </div>
 </template>
 
 <script>
 import defaultImage from "@/assets/default-avatar.png";
+import { mapGetters } from "vuex";
 
 export default {
     name: "UserProfile",
     data() {
         return {
-            user: {
-                name: "unknown",
-                username: "@unknown",
-                imagePath: null
-            },
             defaultImage 
         };
     },
-    mounted() {
-        this.loadUserData();
+    computed:{
+        ...mapGetters(["getUser"])
     },
-    methods: {
-        loadUserData() {
-            const userSettings = localStorage.getItem("UserSetting");
-            if (userSettings) {
-                try {
-                    const parsedUser = JSON.parse(userSettings);
-                    this.user = {
-                        name: parsedUser.name || "unknown",
-                        username: "@" + parsedUser.username || "@unknown",
-                        imagePath: parsedUser.imagePath 
-                    };
-                } catch (error) {
-                    console.error("Erro ao carregar os dados do usuário:", error);
-                }
-            }
+    methods:{
+        getImage(imagePath){
+            return imagePath ? `${process.env.VUE_APP_API_URL}/api/files/images?file-id=${imagePath}`: 'no-photo.jpg';
         },
-
-        getProfileImage() {
-            if (this.user.imagePath) {
-                return `http://localhost:8080/uploads/${this.user.imagePath}`; 
-            }
-            return this.defaultImage;
-        }
     }
+    
 };
 </script>
 

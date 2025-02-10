@@ -1,7 +1,7 @@
 <template>
     <div 
-        class="relative rounded-full w-14 h-14 cursor-pointer bg-cleangray flex items-center justify-center"
-        @click="navigateToServer"
+        class="relative rounded-full w-14 h-14 cursor-pointer bg-cleangray flex items-center 
+        justify-center hover:bg-purple"
         @mouseenter="hovered = true"
         @mouseleave="hovered = false"
     >
@@ -32,10 +32,6 @@ export default {
         }
     },
     props: {
-        link: {
-            type: String,
-            required: true
-        },
         name: {
             type: String,
             default: "Servidor"
@@ -45,10 +41,5 @@ export default {
             default: null
         }
     },
-    methods: {
-        navigateToServer() {
-            this.$router.push(this.link);
-        }
-    }
 };
 </script>

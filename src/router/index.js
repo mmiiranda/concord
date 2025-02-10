@@ -19,16 +19,16 @@ const routes = [
     component: LoginView
   },
   {
-    path: '/confirmarEmail',
-    name: 'confirmarEmail',
+    path: '/confirm-email',
+    name: 'confirm-email',
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: ConfirmarEmailView
   },
   {
-    path: '/redefinirSenha',
-    name: 'redefinirSenha',
+    path: '/reset-password',
+    name: 'reset-password',
     component: RedefinitSenha
   }
 ]

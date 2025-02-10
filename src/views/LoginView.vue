@@ -1,28 +1,30 @@
 <template>
-  <div class="bg-cleangray h-dvh flex">
-    <div class="h-full w-full xl:w-5/12 bg-darkblue text-white flex flex-col justify-center items-center lg:p-12 p-6">
+  <div class="bg-cleangray flex min-h-screen">
+    <div class="w-full md:w-5/12 bg-darkblue text-white flex flex-col justify-center items-center lg:p-12 p-6 animate-spawn">
       <LoginForm v-if="Isregister == 0"/>
       <RegisterForm @loading="toogleLoading" v-else/>
       <div class="text-white mt-6">
         <div v-if="Isregister == 0">
-          Não tem uma conta? <span class="text-blue cursor-pointer" @click="toogleForm">Registre-se</span>
+          Don't have an account?  <span class="text-blue cursor-pointer" @click="toogleForm">Sign Up</span>
         </div>
         <div v-else>
-          Já conta? <span class="text-blue cursor-pointer" @click="toogleForm">Log In</span>
+          Already have an account? <span class="text-blue cursor-pointer" @click="toogleForm">Log In</span>
         </div>
       </div>
     </div>
-    <div class="xl:w-full xl:grid place-items-center hidden">
-      <div class="w-1/3">
-        <img src="../assets/LoginImage.svg" alt="Jovem olhando um notebook  ">
+    <div class="md:w-full md:grid place-items-center hidden">
+      <div class="w-1/2">
+        <img src="../assets/LoginImage.png" alt="Jovem olhando um notebook  ">
       </div>
     </div>
   </div>
+  <EmailForForgetPassword v-show="isOpen" class="text-white" />
 </template>
 <script>
 import LoginForm from "@/components/form/Login.vue";
 import RegisterForm from "@/components/form/Register.vue";
-import { mapActions } from "vuex";
+import EmailForForgetPassword from "@/components/form/EmailForForgetPassword.vue";
+import { mapActions, mapGetters } from "vuex";
 
 
     export default {
@@ -31,6 +33,9 @@ import { mapActions } from "vuex";
           return{
             Isregister: 0, 
           }
+        },
+        computed:{
+          ...mapGetters("modalForgetPassword",["isOpen"])
         },
         methods: {
           ...mapActions(["toogleLoading"]),
@@ -41,6 +46,7 @@ import { mapActions } from "vuex";
         components: {
           LoginForm,
           RegisterForm,
+          EmailForForgetPassword
         }
     }
 </script>

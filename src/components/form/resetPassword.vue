@@ -3,16 +3,16 @@
         <div class="flex flex-col gap-3">
             <InputAlt 
                 id="newPassword"
-                name="Nova Senha"
-                placeholder="Nova Senha"
+                name="New Password"
+                placeholder="New Password"
                 type="password"
                 required
                 minlength="8"
             />
             <InputAlt 
                 id="confirmNewPassword"
-                name="Confirmar Nova Senha"
-                placeholder="Confirmar Nova Senha"
+                name="Confirm New Password"
+                placeholder="Confirm New Password"
                 type="password"
                 required
                 minlength="8"
@@ -67,7 +67,6 @@ export default {
             const token = this.$route.query.token;
 
             let senha = newPassword.trim()
-
             
 
             if (senha === "" || confirmNewPassword.trim() === "") {
@@ -90,7 +89,7 @@ export default {
 
             this.toogleLoading()
             try {
-                const response = await fetch(`http://localhost:8080/api/auth/reset-password?token=${token}`, {
+                const response = await fetch(`${process.env.VUE_APP_API_URL}/api/auth/reset-password?token=${token}`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"

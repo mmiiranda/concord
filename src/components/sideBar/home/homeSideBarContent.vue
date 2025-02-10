@@ -1,36 +1,103 @@
-    <template>
-    <div class="flex flex-col">
-        <div class="flex justify-between items-center border-b-2  border-darkblue/80     px-3 py-2">
-            <h3 class="text-lg font-bold">Direct messages</h3>
-        </div>
-        <div class="flex flex-col gap-2 p-2 mt-2">
-            <miniFriendProfile 
-            v-for="(friend, index) in friends" 
-                :key="index" 
-                :name="friend.name"
-                :src="friend.src" 
-            />
-        </div>
+  <template>
+    <div class="h-full w-60 flex flex-col text-white">
+
+      <div v-if="!activeChat || activeChat.type === 'dm'">
+        <h2 class="text-lg font-bold px-4 py-2 bg-darkblue">Friends</h2>
+        <ul>
+          <li
+            v-for="friend in friendsList"
+            :key="friend.id"
+            class="cursor-pointer px-4 py-2 hover:bg-white/20"
+            @click="openDm(friend)"
+          >
+            <MiniFriendProfile :name="friend.username" :src="friend.imagePath" />
+          </li>
+        </ul>
+      </div>
+
+      <div v-else-if="activeChat.type === 'server'">  
+        <h2 classHoje="text-lg font-bold px-4 py-2">Canais</h2>
+        <ul>
+          <li
+            v-for="channel in channelsFromServer(activeChat.serverId)"
+            :key="channel.id"
+            class="cursor-pointer px-4 py-2 hover:bg-gray-700"
+            @click="openServerChannel(channel)"
+          >
+            {{ channel.name }}
+          </li>
+        </ul>
+      </div>
     </div>
-</template>
+  </template>
 
-<script>
-import miniFriendProfile from '@/components/friends/miniFriendProfile.vue';
+  <script>
+  import MiniFriendProfile from "@/components/friends/miniFriendProfile.vue";
+  import { mapGetters, mapActions } from "vuex";
 
+  export default {
+    name: "SideBar",
+    components: {
+      MiniFriendProfile
+    },
+    computed: {
+      ...mapGetters(["getFriends", "getServers"]),
+      ...mapGetters("chat", ["getActiveChat"]),
 
-    export default {
-        name: "homeSideBarContent",
-        data(){
-            return {
-                friends: [
-                { id: 1, name: "JoãoDIas", src: "https://preview.redd.it/personagens-aleat%C3%B3rios-com-camisas-de-time-cr%C3%A9ditos-das-v0-w2nla01ji0md1.jpg?width=382&format=pjpg&auto=webp&s=3ccf31f1375cd203f6d82804fec7e49c045d1af4" , newMessage: true },
-                { id: 2, name: "MariaMela", src: "https://i.pinimg.com/236x/31/6d/7f/316d7fb24c30d4704881cc543e7765bd.jpg" ,  newMessage: true},
-                { id: 3, name: "CarlosBLue", src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR1g4jOvA8j6QTcmIuPazNZK3A1m_iys0Hatw&s" ,  newMessage: false},
-                ],
-            }
-        },
-        components: {
-            miniFriendProfile
+      friendsList() {
+        return this.getFriends;
+      },
+      activeChat() {
+        return this.getActiveChat;
+      }
+    },
+    methods: {
+      ...mapActions("chat", ["setActiveChat"]),
+      ...mapActions("mobile", ["closeSidebar"]),
+      ...mapActions("websocket",["markMessagesAsRead"]),
+
+      channelsFromServer(serverId) {
+        const server = this.getServers.find((sv) => sv.id === serverId);
+        return server && server.channels ? server.channels : [];
+      },
+
+      async openDm(friend) {
+        if (this.activeChat && this.activeChat.id === friend.id && this.activeChat.type === "dm") {
+          return;
         }
+
+        this.setActiveChat({
+          id: friend.id,
+          name: friend.username,
+          type: "dm" ,
+          imagePath: friend.imagePath
+        });
+
+        await this.markMessagesAsRead({ fromUserId: friend.id });
+        console.log(`✅ Mensagens de ${friend.id} marcadas como lidas.`);
+
+        this.closeSidebar()
+      },
+
+      openServerChannel(channel) {
+        this.setActiveChat({
+          id: channel.id,
+          name: channel.name,
+          serverId: channel.serverId,
+          type: "server" 
+        });
+      },
+      
+      getImage(imagePath){
+        console.log(imagePath)
+        return imagePath ? `${process.env.VUE_APP_API_URL}/api/files/images?file-id=${imagePath}`: "no-photo.jpg";
+      }
     }
-</script>
+  };
+  </script>
+
+  <style scoped>
+  .bg-sidebar {
+    background-color: #2f3136;
+  }
+  </style>

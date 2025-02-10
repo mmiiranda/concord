@@ -7,6 +7,8 @@ import "vue3-toastify/dist/index.css";
 import "./assets/tailwind.css";
 
 const app = createApp(App);
+// app.config.globalProperties.$api_url = const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
+
 
 app.config.globalProperties.$toast = (message, type = "info", options = {}) => {
   const defaultOptions = {

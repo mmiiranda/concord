@@ -1,14 +1,14 @@
 <template>
-    <div class="h-[10vh] w-full flex justify-between items-center px-8">
+    <div class="h-20 bg-darkblue w-full flex justify-between items-center px-8">
         <div class="flex gap-4">
-            <toogleIconButton src="Bell.svg"/>
-            <userProfile name="Pablo" username="reboloerrado" src="https://i.scdn.co/image/ab67616d0000b2738c46c9a59ac57eeb959d064e" />
+            <userProfile />
         </div>
         <div>
             <div class="flex ">
-                <toogleIconButton :src="icons.micIcon"/>
-                <toogleIconButton :src="icons.headphoneIcon"/>
-                <toogleIconButton  
+                <toogleIconButton       
+                @click="exit"
+                :src="icons.logoutIcon"/>
+                <toogleIconButton       
                 @click="emitToogleConfig"
                 :src="icons.configIcon"/>
             </div>
@@ -22,6 +22,8 @@ import userProfile from "../user/userProfile.vue"
 import micIcon from "../icon/mic.svg"
 import headphoneIcon from "../icon/headphone.svg"
 import configIcon from "../icon/config.svg"
+import logoutIcon from "../icon/logoutIcon.svg"
+import { mapActions, mapGetters } from 'vuex';
 
     export default {
         name: "headerFooter",
@@ -30,13 +32,22 @@ import configIcon from "../icon/config.svg"
             icons: {
                 micIcon,
                 headphoneIcon,
-                configIcon
+                configIcon,
+                logoutIcon
             }
         };
         },
+        computed:{
+            ...mapGetters(["getToken", "getUser"]),
+        },
         methods: {
+            ...mapActions(["logout"]),
             emitToogleConfig(){
                 this.$emit("toogleConfig")
+            },
+            exit(){
+                this.$router.push("/login");
+                setTimeout(()=>{this.logout()}, 200 )
             }
         },  
         components: {

@@ -8,12 +8,12 @@
         @toogle-config="toogleConfig"
         />
 
-        <div class="size-full  grid px-4 md:px-10 mt-6">
+        <div class="size-full min-h-screen overflow-y-auto grid px-4 md:px-10 mt-6">
             <div class="bg-[#363636] h-96 px-2 xl:px-12 rounded-t-lg flex flex-col">
-              <h2 class="text-3xl font-bold">User Settings</h2>
-              <UserSettings />
+                <h2 class="text-3xl font-bold">User Settings</h2>
+                <UserSettings />
             </div>
-        </div>  
+        </div>
     </div> 
 </template>
 

@@ -65,6 +65,7 @@
 import inputAlt from "@/components/input/inputAlt.vue";
 import buttonAlt from "@/components/input/buttonAlt.vue";
 import checkboxAlt from "@/components/input/checkbox.vue";
+import { mapActions } from "vuex";
 
 export default {
     name: "RegisterForm",
@@ -74,6 +75,7 @@ export default {
         checkboxAlt
     },
     methods: {
+        ...mapActions("register",["setUser"]),
         handleSubmit(event) {
             const form = event.target.closest("form");
             
@@ -116,6 +118,7 @@ export default {
                     body: JSON.stringify(json)
                 });
                 if (response.status === 202) {
+                    this.setUser(json)
                     this.emitLOading()
                     this.$router.push("/confirm-email");
                 } else {

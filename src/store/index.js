@@ -4,6 +4,8 @@ import websocket from "./websocket";
 import rightsidebar from "./rightsidebar";
 import mobile from "./mobile"
 import router from "@/router";
+import register from "./register";
+import modalForgetPassword from "./modalForgetPassword";
 
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
@@ -29,13 +31,14 @@ export default createStore({
     getServers: (state) => state.serversList,
     isLoggedIn: (state) => !!state.token,
     getFirstAcess: (state) => state.firstAcess,
+    getModalForgetPassword: (state) => state.ModalForgetPassword,
 
-    // Contador de solicitações de amizade pendentes
+    
     pendingRequestsCount: (state) => state.pendingRequestsCount,
-    // Lista completa de solicitações pendentes
+    
     getPendingRequests: (state) => state.pendingRequests,
 
-    // Amigos com mensagens pendentes (unread)
+    
     getFriendsWithPendingMessages: (state, getters, rootState, rootGetters) => {
       const unreadChats = rootGetters["websocket/unreadChats"];
       const activeChat = rootGetters["chat/getActiveChat"];
@@ -96,6 +99,10 @@ export default createStore({
       commit("SET_FIRST_ACESS", value);
     },
 
+    setModalForgetPassword({commit}, value){
+      commit("SET_MODALFORGETPASSWORD", value);
+    },
+
     toogleLoading({ commit }) {
       commit("TOGGLE_LOADING");
     },
@@ -142,6 +149,7 @@ export default createStore({
           dispatch("fetchServers")
           dispatch("fetchPendingRequests");
           dispatch("websocket/connectWebSocket", token, { root: true });
+          dispatch("websocket/fetchUnreadChats", { root: true }); 
           return true;
     
         } catch (error) {
@@ -233,7 +241,13 @@ export default createStore({
           });
         } else {
           const errorData = await response.json();
-          console.error(`Erro ao atualizar ${field}:`, errorData);
+          console.error(`Erro ao atualizar ${field}:`, errorData.message);
+
+          toast.error(`${errorData.message}. `, {
+            autoClose: 1000,
+            position: "top-right",
+            theme: "dark",
+          });
         }
       } catch (err) {
         console.error(`Erro na requisição para atualizar ${field}:`, err);
@@ -401,6 +415,8 @@ export default createStore({
     chat: chatModule,
     websocket,
     rightsidebar,
-    mobile
+    mobile,
+    register,
+    modalForgetPassword
   },
 });

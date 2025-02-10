@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-[calc(100dvh-5rem)] bg-[#272727] fixed z-50 md:relative  md:flex">
+  <div class="flex h-[calc(100dvh-5rem)] bg-dark-gray-1 fixed z-40 md:relative  md:flex" ref="sidebar">
     <div class="flex flex-col items-center py-6 px-1">
       <div class="flex flex-col items-center  gap-1">
 
@@ -34,7 +34,7 @@
           </div>
         </div>
 
-        <div class="w-4/5 bg-hovergray h-[3px] mt-2"></div>
+        <div class="w-4/5 bg-medium-gray h-[3px] mt-2"></div>
         
         <div class="flex flex-col gap-3">
           <MiniServerIcon
@@ -57,12 +57,12 @@
         class="bg-[#363636] flex flex-col  text-white min-w-48 relative"
       >
         <div>
-          <div 
+          <!-- <div 
             class="absolute right-3 top-3 cursor-pointer block md:hidden"
             @click="closeSidebar"
           >
             X
-          </div>
+          </div> -->
           <HomeSideBarContent />
         </div>
       </div>
@@ -95,11 +95,13 @@ export default {
     return {
       isOpen: true,
       ModalCreateServer: false,
+      mobileMenuAux: false,
     };
   },
   computed: {
     ...mapGetters("websocket", ["unreadChats", "users"]),
     ...mapGetters(["getFriendsWithPendingMessages", "getServers"]),
+    ...mapGetters("mobile",["isMobile","isSidebarOpen"]),
     friendsWithPendingMessages() {
       console.log(this.$store.getters.getFriendsWithPendingMessages);
       return this.$store.getters.getFriendsWithPendingMessages;
@@ -138,7 +140,6 @@ export default {
     // Função para abrir o chat com um amigo
    
     async openChat(friend) {
-      console.log(`📤 Abrindo chat com amigo ID: ${friend.id}`);
       
       // 1) Seta o chat ativo direto no Vuex
       this.setActiveChat({
@@ -150,7 +151,6 @@ export default {
 
       // 2) Chama a action para marcar como lidas
       await this.markMessagesAsRead({ fromUserId: friend.id });
-      console.log(`✅ Mensagens de ${friend.id} marcadas como lidas.`);
 
       // 3) (Opcional) Emitir para o pai, se lineainda precisar
       this.closeSidebar()
@@ -176,20 +176,28 @@ export default {
       this.closeSidebar()
     },
     
+    checkController(){
+      if(this.mobileMenuAux) this.closeSidebar();
+    },
+
     toggleModalCreateServer() {
       this.ModalCreateServer = !this.ModalCreateServer;
       console.log(`🔄 Modal de criação de servidor está agora: ${this.ModalCreateServer ? 'Aberto' : 'Fechado'}`);
     },
+
+    handleClickOutsideSideBar(event){
+      if(this.$refs.sidebar && !this.$refs.sidebar.contains(event.target) && this.isMobile && this.isSidebarOpen){
+        this.checkController()
+        this.mobileMenuAux = !this.mobileMenuAux
+      }
+      
+    }
   },
   mounted() {
-    const token = this.$store.getters["getToken"];
-    if (token) {
-      this.$store.dispatch("websocket/connectWebSocket", token);
-      this.$store.dispatch("websocket/fetchUnreadChats");   
-      this.$store.dispatch("fetchServers"); // Chama fetchServers do módulo raiz
-    } else {
-      console.error("⚠️ Token JWT não encontrado. Não foi possível conectar ao WebSocket.");
-    }
+      document.addEventListener("click", this.handleClickOutsideSideBar);
+    },
+  beforeUnmount() {
+      document.removeEventListener("click", this.handleClickOutsideSideBar);
   },
 };
 </script>

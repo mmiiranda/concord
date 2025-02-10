@@ -1,5 +1,5 @@
 <template>
-    <div class="friend-chat-row border-b-2 py-3 border-[#808080] flex w-full justify-between items-center
+    <div class="friend-chat-row border-b-2 py-3 border-[#383838] flex w-full justify-between items-center
     hover:bg-gray/20 px-2 transition-all ease-in">
       <div class="flex items-center gap-2 cursor-pointer">
         <div class="bg-darkblue flex h-9 w-9 relative rounded-full justify-center items-center">

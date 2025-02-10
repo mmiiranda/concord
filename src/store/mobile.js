@@ -4,26 +4,26 @@ const state = {
 };
 
 const getters = {
-  isSidebarOpen: (state) => state.isSidebarOpen, // Removido o `&& state.isMobile`
+  isSidebarOpen: (state) => state.isSidebarOpen,
   isMobile: (state) => state.isMobile,
 };
 
 const mutations = {
   TOGGLE_SIDEBAR(state) {
-    state.isSidebarOpen = !state.isSidebarOpen; // Permite abrir no PC também
+    state.isSidebarOpen = !state.isSidebarOpen;
   },
   CLOSE_SIDEBAR(state) {
-    if(state.isMobile) state.isSidebarOpen = false;
+    if (state.isMobile) {
+      state.isSidebarOpen = false;
+      console.log("❌ Sidebar fechada por clique externo.");
+    }
   },
   OPEN_SIDEBAR(state) {
     state.isSidebarOpen = true;
   },
   SET_MOBILE(state, isMobile) {
     state.isMobile = isMobile;
-    state.isSidebarOpen = false;
-    if (!isMobile) {
-      state.isSidebarOpen = true; // Fecha no desktop se necessário
-    }
+    state.isSidebarOpen = !isMobile; // No mobile começa fechada, no desktop aberta
   },
 };
 

@@ -152,4 +152,4 @@ This will create an executable for your platform.
 
 
 ---  
-*Thank you for checking out the Concord Chat Back-end! We look forward to your contributions and feedback.*
+*Thank you for checking out the Concord Chat! We look forward to your contributions and feedback.*

@@ -1,7 +1,7 @@
 <template>
     <div 
         class="relative rounded-full w-14 h-14 cursor-pointer bg-cleangray flex items-center 
-        justify-center hover:bg-purple-700"
+        justify-center hover:bg-purple"
         @mouseenter="hovered = true"
         @mouseleave="hovered = false"
     >

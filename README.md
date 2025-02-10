@@ -3,7 +3,7 @@
 **Current Version**: `0.1.0-beta (open to public testing)`  
 **PT-BR README**: [Clique aqui para ver em Português](./README-PTBR.md)  
 **GitHub Projects (Front-end)**: [Front-end Project Board](https://github.com/mmiiranda/concord)  
-**Back-end Repository**: [Concord Chat Back-end](http://github.com/marcusnogueiraa/concord-backend)  
+**Back-end Repository**: [Concord Chat Back-end](http://github.com/marcusnogueiraa/concord)  
 **Project Deploy**: [Front-end Live Demo](http://164.68.101.141:8081/)  
 
 ---
@@ -152,4 +152,4 @@ This will create an executable for your platform.
 
 
 ---  
-*Thank you for checking out the Concord Chat Back-end! We look forward to your contributions and feedback.*
+*Thank you for checking out the Concord Chat! We look forward to your contributions and feedback.*
